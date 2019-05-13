@@ -23,6 +23,7 @@ object LateDataSideOut {
 
   def main(args: Array[String]): Unit = {
 
+    import org.apache.flink.api.scala._
     val lateOutputTag = new OutputTag[JSONObject]("late-data")
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment

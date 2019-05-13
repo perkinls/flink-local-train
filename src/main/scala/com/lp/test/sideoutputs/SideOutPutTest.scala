@@ -21,7 +21,7 @@ import org.apache.flink.util.{Collector, OutputTag}
   */
 object SideOutPutTest {
 
-  val outputTag = new OutputTag("side_output>5")
+  val outputTag = new OutputTag[String]("side_output>5")
 
   def main(args: Array[String]): Unit = {
 
