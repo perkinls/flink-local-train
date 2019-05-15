@@ -1,8 +1,3 @@
-# Created by .ignore support plugin (hsz.mobi)
-### Scala template
-*.class
-*.log
-### Java template
 # Compiled class file
 *.class
 
@@ -15,20 +10,29 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-.idea/workspace.xml
-src/test/
-target/
-.idea
-test
+# Package Files #
+*.zip
+*.tar.gz
+*.rar
+*.jar
+*.war
+*.ear
+*.iml
+/.idea
+.idea/
+.idea/*
+.svn
+*.svn
+doc
+*/target
+/bin
+/.settings
+/.classpath
+/.project
+rebel*.xml
+metastore_db
+
+*/target
