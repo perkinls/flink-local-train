@@ -18,7 +18,12 @@ import redis.clients.jedis.Jedis
 
 /**
   * <p/> 
-  * <li>Description: TODO</li>
+  * <li>Description: mapFunction算子访问外部存储</li>
+  * 弊端：
+  *     和数据库交互过程是一个同步，后一个会等待前一个完成。
+  * 注意：
+  *     可以通过增加MapFunction的一个较大并行度也可以改善吞吐量的，但是这意味着更高的资源开销，
+  *     更多的MapFunction实例意味着更多的task，线程，flink内部网络连接，数据库的链接，缓存，更多内部状态开销
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-15 13:42</li> 
   */
