@@ -59,16 +59,16 @@ object AsyncIOSideTableJoinMysql {
     val result = if (true) {
       AsyncDataStream.orderedWait(source[JSONObject],
         asyncFunction,
-        1000000L,
+        1000000L,   //异步请求超时时间
         TimeUnit.MILLISECONDS,
-        20)
+        20)   //异步请求容量
         .setParallelism(1)
     } else {
       AsyncDataStream.unorderedWait(source[JSONObject],
         asyncFunction,
-        1000000L,
+        1000000L,    //异步请求超时时间
         TimeUnit.MILLISECONDS,
-        20)
+        20)   //异步请求容量
         .setParallelism(1)
     }
 
@@ -160,7 +160,7 @@ object AsyncIOSideTableJoinMysql {
                 return
               }
 
-              if (event.succeeded()) {
+              if (event.succeeded()) { //成功情况下
                 val rs = event.result()
                 val rows: util.List[JsonObject] = rs.getRows
                 if (rows.size() <= 0) {
@@ -174,7 +174,7 @@ object AsyncIOSideTableJoinMysql {
                   cache.put(key, desc)
                 })
 
-              } else {
+              } else {  //异常的情况，不进行处理会阻塞
                 resultFuture.complete(null)
               }
 
