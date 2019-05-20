@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.watermark.Watermark
 
 /**
   * <p/> 
-  * <li>Description: 自定义时间戳分配器和watermark发射器</li>
+  * <li>Description: 自定义周期性时间戳分配器和watermark发射器</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-08 22:37</li> 
   */

@@ -1,7 +1,7 @@
 package com.lp.test.join
 
 import java.io.Serializable
-import java.util.{Properties, Random}
+import java.util.Properties
 
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
@@ -40,11 +40,10 @@ object TumblingWindowJoin {
     props.setProperty("bootstrap.servers", "master:9092")
     props.setProperty("group.id", "TumblingWindowJoin")
 
-    //构建kafka消费者 293条
+    //构建kafka消费者
     val kafkaConsumer1 = new FlinkKafkaConsumer("fk_kv_topic", new SimpleStringSchema(), props)
     kafkaConsumer1.setStartFromEarliest()
 
-    //73条
     val kafkaConsumer2 = new FlinkKafkaConsumer("fk_kv_1_topic", new SimpleStringSchema(), props)
     kafkaConsumer2.setStartFromEarliest()
 
@@ -70,16 +69,13 @@ object TumblingWindowJoin {
       .join(operator2)
       .where(elem => elem.name)
       .equalTo(elem => elem.name)
-      //todo 滚动窗口会产生笛卡尔积
       .window(TumblingEventTimeWindows.of(Time.milliseconds(10))) //窗口分配器定义程序
       .apply((e1, e2) => {
       (e1.name, e1.value, e2.value)
-    }).print()
-
-//      .keyBy(_._1)
-//      .reduce((e1, e2) => {
-//        (e1._1, e1._2 + e2._2, e1._3 + e2._3) //聚合操作
-//      }).print()
+    }).keyBy(_._1)
+      .reduce((e1, e2) => {
+        (e1._1, e1._2 + e2._2, e1._3 + e2._3) //聚合操作
+      }).print()
 
     env.execute("TumblingWindowJoin")
 

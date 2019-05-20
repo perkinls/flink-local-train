@@ -1,8 +1,9 @@
 package com.lp.test.project
 
 import java.text.SimpleDateFormat
-import java.util.Properties
+import java.util.{Date, Properties}
 
+import org.apache.flink.api.common.functions.RuntimeContext
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.streaming.api.TimeCharacteristic
@@ -13,9 +14,16 @@ import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
+import org.apache.flink.streaming.connectors.elasticsearch.{ElasticsearchSinkFunction, RequestIndexer}
+import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 import org.apache.flink.util.Collector
+import org.apache.http.HttpHost
+import org.elasticsearch.action.index.IndexRequest
+import org.elasticsearch.client.Requests
 import org.slf4j.LoggerFactory
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * <p/> 
@@ -23,11 +31,11 @@ import org.slf4j.LoggerFactory
   * 日志分析系统
   * 功能：
   * 1.最近一分钟每个域名产生的流量统计
-  *       Flink接受Kafka数据处理
+  * Flink接受Kafka数据处理
   *
   * 2.统计一分钟内每个用户产生的流量统计
-  *   域名和用户有对应关系
-  *       Flink接受Kafka数据处理+Flink读取域名和用户的配置数据
+  * 域名和用户有对应关系
+  * Flink接受Kafka数据处理+Flink读取域名和用户的配置数据
   *
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-04-28 20:45</li> 
@@ -50,7 +58,7 @@ object LogAnalysis {
     import org.apache.flink.api.scala._
     //1. 接受来自kafka的数据,配置数据源
     val data = env.addSource(consumer)
-    val logData = data.map(x => {   //数据清洗
+    val logData = data.map(x => { //数据清洗
       val splits = x.split("\t")
       val level = splits(2)
       val timeStr = splits(3)
@@ -74,23 +82,21 @@ object LogAnalysis {
 
     //2. 设置timestamp和watermark,解决时序性问题
     // AssignerWithPeriodicWatermarks[T] 对应logdata的tuple类型
-    logData.assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(Long, String, Long)] {
+    val resultData = logData.assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(Long, String, Long)] {
       //最大无序容忍的时间 10s
       val maxOutOfOrderness = 10000L
       //当前最大的TimeStamp
       var currentMaxTimeStamp: Long = _
+
       /**
         * 设置TimeStamp生成WaterMark
-        * @return
         */
       override def getCurrentWatermark: Watermark = {
         new Watermark(currentMaxTimeStamp - maxOutOfOrderness)
       }
+
       /**
         * 抽取时间
-        * @param element
-        * @param previousElementTimestamp
-        * @return
         */
       override def extractTimestamp(element: (Long, String, Long), previousElementTimestamp: Long): Long = {
         //获取数据的event time
@@ -107,30 +113,56 @@ object LogAnalysis {
 
           val domain = key.getField(0).toString
           var sum = 0l
+          val times = ArrayBuffer[Long]()
+
           val iterator = input.iterator
-          var time: String = _
           while (iterator.hasNext) {
             val next = iterator.next()
-            sum += next._3 //traffic求和
-
-            //日期去掉秒，随便取一个时间转为（yyy-MM-dd HH:mm)即可
-            time = new SimpleDateFormat("yyy-MM-dd HH:mm").format(next._1)
+            sum += next._3         // traffic流量字段求和
+            times.append(next._1)
           }
 
           /**
-            * 第一个参数：这一分钟的时间
+            * 第一个参数：这一分钟的时间 2019-09-09 20:20
             * 第二个参数：域名
             * 第三个参数：traffic的和
             */
+          val time = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(times.max))
           out.collect((time, domain, sum))
         }
       })
 
-    //todo 11-14
+    val httpHosts = new java.util.ArrayList[HttpHost]
+    httpHosts.add(new HttpHost("192.168.199.233", 9200, "http"))
 
-    //4. 结果输出
+    val esSinkBuilder = new ElasticsearchSink.Builder[(String, String, Long)](
+      httpHosts,
+      new ElasticsearchSinkFunction[(String, String, Long)] {
+        def createIndexRequest(element: (String, String, Long)): IndexRequest = {
+          val json = new java.util.HashMap[String, Any]
+          json.put("time", element._1)
+          json.put("domain", element._2)
+          json.put("traffics", element._3)
 
+          val id = element._1 + "-" + element._2
 
+          return Requests.indexRequest()
+            .index("cdn")
+            .`type`("traffic")
+            .id(id)
+            .source(json)
+        }
+
+        override def process(t: (String, String, Long), runtimeContext: RuntimeContext, requestIndexer: RequestIndexer): Unit = {
+          requestIndexer.add(createIndexRequest(t))
+        }
+      }
+    )
+
+    esSinkBuilder.setBulkFlushMaxActions(1)
+
+    resultData.addSink(esSinkBuilder.build) //.setParallelism(5)
+
+    env.execute("LogAnalysis")
   }
-
 }

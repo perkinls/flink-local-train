@@ -1,13 +1,11 @@
 package com.lp.test.source
 
-import java.util
 import java.util.Properties
 
 import com.lp.test.trigger.CustomProcessTimeTrigger
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.serialization.SimpleStringSchema
-import org.apache.flink.runtime.jobgraph.JobVertex
 import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -17,7 +15,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 /**
   * <p/> 
-  * <li>Description: kafka消费者测试</li>
+  * <li>Description: kafka消费者测试,自定义触发器</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-07 22:31</li> 
   */
@@ -55,18 +53,19 @@ object KafkaSourceTest {
     val kafkaConsumer = new FlinkKafkaConsumer("fk_string_topic",
       new SimpleStringSchema(),
       props)
-    kafkaConsumer.setStartFromEarliest()
+      .setStartFromEarliest()
 
     import org.apache.flink.api.scala._
     val stream = env
       .addSource(kafkaConsumer)
       .map(new RichMapFunction[String, Int] {
         override def map(value: String): Int = {
+
           Integer.valueOf(value)
         }
       })
       .timeWindowAll(Time.seconds(20))
-      .trigger(new CustomProcessTimeTrigger)
+      .trigger(new CustomProcessTimeTrigger)  //10个元素出发一次计算
 
     stream.sum(0).print()
 

@@ -46,7 +46,7 @@ object CountApp {
       }
     })
 
-    val filePath = "file:///Users/rocky/IdeaProjects/imooc-workspace/data/04/sink-scala-counter-out/"
+    val filePath = "file:///Users/lipan/workspace/flink_demo/flink-local-train/src/main/resources/sink"
     info.writeAsText(filePath, WriteMode.OVERWRITE).setParallelism(3)
     val jobResult = env.execute("CounterApp")
 

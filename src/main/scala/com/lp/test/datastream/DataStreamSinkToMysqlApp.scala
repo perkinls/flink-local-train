@@ -11,9 +11,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
   */
 object DataStreamSinkToMysqlApp {
   def main(args: Array[String]): Unit = {
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val text = env.socketTextStream("localhost", 9999)
-
 
     val personStream = text.map(new MapFunction[String, person] {
       override def map(value: String): person = {

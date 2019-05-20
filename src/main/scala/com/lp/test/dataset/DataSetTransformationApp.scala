@@ -12,9 +12,6 @@ object DataSetTransformationApp {
 
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
-
-
-
     mapFunction(env)
     filterFunction(env)
     mapPartitionFunction(env)
@@ -100,7 +97,7 @@ object DataSetTransformationApp {
     */
   def joinFunction(env: ExecutionEnvironment): Unit = {
     val info1 = ListBuffer[(Int, String)]() // 编号  名字
-    info1.append((1, "PK哥"));
+    info1.append((1, "P哥"));
     info1.append((2, "J哥"));
     info1.append((3, "小队长"));
     info1.append((4, "猪头呼"));
@@ -207,7 +204,6 @@ object DataSetTransformationApp {
     data.mapPartition(x => {
       val connection = DBUtils.getConection()
       println(connection + "....")
-      //TODO... 保存数据到DB
       DBUtils.returnConnection(connection)
       x
     }).print()

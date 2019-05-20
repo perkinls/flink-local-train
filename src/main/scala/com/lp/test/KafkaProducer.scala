@@ -11,6 +11,8 @@ import scala.util.Random
 
 /**
   * <p/> 
+  * zk: mg01.cechealth.cn:2181,mg02.cechealth.cn:2181,mg03.cechealth.cn:2181
+  * brokers:dn01.cechealth.cn:9092,dn02.cechealth.cn:9092,dn03.cechealth.cn:9092
   * <li>Description: kafka生产者</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-07 21:54</li> 
@@ -32,10 +34,10 @@ object KafkaProducer {
     var random = new Random(2)
 
     //指定发送任意格式的数据到kafka
-    for (e <- 0 until 2) {
-//      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
+    for (e <- 0 until 100000) {
+      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
 //      sendMsgJson(producer)
-      sendMsgKv(producer)
+//      sendMsgKv(producer)
 //      sendMsgEvent(producer)
 
     }
@@ -51,7 +53,7 @@ object KafkaProducer {
     val points: Random = new Random(2)
     val arrayBuffer = Array[String]("apple", "pear", "nut", "grape", "banana", "pineapple", "pomelo", "orange")
 
-    for (i <- 0 until 10) {
+    for (i <- 0 until 100) {
       val json: JSONObject = new JSONObject
       json.put("fruit", arrayBuffer(points.nextInt(8)))
       json.put("number", points.nextInt(4))
