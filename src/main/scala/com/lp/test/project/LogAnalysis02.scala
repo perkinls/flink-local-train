@@ -17,13 +17,16 @@ import scala.collection.mutable
   * <p/> 
   * <li>Description:
   * 日志分析系统
+  * 功能二：
+  *   统计一分钟内每个用户产生的流量统计
+  *   域名和用户有对应关系
+  *   Flink接受Kafka数据处理+Flink读取域名和用户的配置数据
   *
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-04-29 20:10</li> 
   */
 object LogAnalysis02 {
 
-  // 在生产上记录日志建议采用这种方式
   val logger = LoggerFactory.getLogger("LogAnalysis02")
 
   def main(args: Array[String]): Unit = {
@@ -33,11 +36,11 @@ object LogAnalysis02 {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     import org.apache.flink.api.scala._
-    val topic = "pktest"
+    val topic = "project_test"
 
     val properties = new Properties()
-    properties.setProperty("bootstrap.servers", "192.168.199.233:9092")
-    properties.setProperty("group.id", "test-pk-group")
+    properties.setProperty("bootstrap.servers", "master:9092")
+    properties.setProperty("group.id", "test-group")
 
     val consumer = new FlinkKafkaConsumer[String](topic,
                       new SimpleStringSchema(),
@@ -46,10 +49,10 @@ object LogAnalysis02 {
     // 接收Kafka数据
     val data = env.addSource(consumer)
 
+    //数据清洗
     val logData = data.map(x => {
       val splits = x.split("\t")
       val level = splits(2)
-
       val timeStr = splits(3)
       var time = 0l
       try {
@@ -60,7 +63,6 @@ object LogAnalysis02 {
           logger.error(s"time parse error: $timeStr", e.getMessage)
         }
       }
-
       val domain = splits(5)
       val traffic = splits(6).toLong
 
@@ -70,39 +72,18 @@ object LogAnalysis02 {
         (x._2, x._3, x._4)   // 1 level(抛弃)  2 time  3 domain   4 traffic
       })
 
-    /**
-      * 在生产上进行业务处理的时候，一定要考虑处理的健壮性以及你数据的准确性
-      * 脏数据或者是不符合业务规则的数据是需要全部过滤掉之后
-      * 再进行相应业务逻辑的处理
-      *
-      * 对于我们的业务来说，我们只需要统计level=E的即可
-      * 对于level非E的，不做为我们业务指标的统计范畴
-      *
-      * 数据清洗：就是按照我们的业务规则把原始输入的数据进行一定业务规则的处理
-      * 使得满足我们的业务需求为准
-      */
-
     //logData.print().setParallelism(1)
-
-
-    val mysqlData = env.addSource(new PKMySQLSource)
+    val mysqlData = env.addSource(new MySQLSource)
     //mysqlData.print()
-
-
     val connectData = logData.connect(mysqlData)
       .flatMap(new CoFlatMapFunction[(Long,String,Long),mutable.HashMap[String,String],String] {
-
         var userDomainMap = mutable.HashMap[String,String]()
-
         // log
         override def flatMap1(value: (Long, String, Long), out: Collector[String]): Unit = {
           val domain = value._2
           val userId = userDomainMap.getOrElse(domain, "")
-
           println("~~~~~" + userId)
-
           out.collect(value._1 + "\t" + value._2 + "\t" + value._3 + "\t" + userId)
-
         }
 
         // MySQL
@@ -110,7 +91,6 @@ object LogAnalysis02 {
           userDomainMap = value
         }
       })
-
 
     connectData.print()
 

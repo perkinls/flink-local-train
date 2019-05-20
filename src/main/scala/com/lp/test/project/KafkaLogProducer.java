@@ -16,7 +16,7 @@ import java.util.Random;
  * <li>@author: lipan@cechealth.cn</li>
  * <li>Date: 2019-04-28 20:21</li>
  */
-public class MockKafkaProducer {
+public class KafkaLogProducer {
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -33,7 +33,7 @@ public class MockKafkaProducer {
             StringBuilder builder = new StringBuilder();
 
             //厂商 地区 level 时间 ip 域名 流量
-            builder.append("lp").append("\t")
+            builder.append("xx").append("\t")
                     .append("CN").append("\t")
                     .append(getLevels()).append("\t")
                     .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).append("\t")
@@ -43,7 +43,7 @@ public class MockKafkaProducer {
             System.out.println(builder.toString());
             producer.send(new ProducerRecord<String, String>(topic, builder.toString()));
 
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         }
 
     }

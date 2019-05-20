@@ -30,12 +30,7 @@ import scala.collection.mutable.ArrayBuffer
   * <li>Description:
   * 日志分析系统
   * 功能：
-  * 1.最近一分钟每个域名产生的流量统计
-  * Flink接受Kafka数据处理
-  *
-  * 2.统计一分钟内每个用户产生的流量统计
-  * 域名和用户有对应关系
-  * Flink接受Kafka数据处理+Flink读取域名和用户的配置数据
+  *   最近一分钟每个域名产生的流量统计
   *
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-04-28 20:45</li> 
@@ -54,11 +49,13 @@ object LogAnalysis {
     properties.setProperty("bootstrap.servers", "master:9092")
     properties.setProperty("group.id", "test-group")
     val consumer = new FlinkKafkaConsumer[String](topic, new SimpleStringSchema(), properties)
+      .setStartFromLatest()
 
     import org.apache.flink.api.scala._
     //1. 接受来自kafka的数据,配置数据源
     val data = env.addSource(consumer)
-    val logData = data.map(x => { //数据清洗
+    //2.数据清洗
+    val logData = data.map(x => {
       val splits = x.split("\t")
       val level = splits(2)
       val timeStr = splits(3)
@@ -80,21 +77,19 @@ object LogAnalysis {
       (x._2, x._3, x._4) //数据清洗按照业务规则取相关数据 1level(不需要可以抛弃) 2time 3 domain 4traffic
     })
 
-    //2. 设置timestamp和watermark,解决时序性问题
+    //3. 设置timestamp和watermark,解决时序性问题
     // AssignerWithPeriodicWatermarks[T] 对应logdata的tuple类型
     val resultData = logData.assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(Long, String, Long)] {
       //最大无序容忍的时间 10s
       val maxOutOfOrderness = 10000L
       //当前最大的TimeStamp
       var currentMaxTimeStamp: Long = _
-
       /**
         * 设置TimeStamp生成WaterMark
         */
       override def getCurrentWatermark: Watermark = {
         new Watermark(currentMaxTimeStamp - maxOutOfOrderness)
       }
-
       /**
         * 抽取时间
         */
@@ -105,7 +100,7 @@ object LogAnalysis {
         timestamp
       }
     })
-      //3. 根据window进行业务逻辑的处理   最近一分钟每个域名产生的流量
+      //4. 根据window进行业务逻辑的处理   最近一分钟每个域名产生的流量
       .keyBy(1) // 此处按照域名进行keyBy
       .window(TumblingEventTimeWindows.of(Time.seconds(60)))
       .apply(new WindowFunction[(Long, String, Long), (String, String, Long), Tuple, TimeWindow] {
@@ -122,32 +117,29 @@ object LogAnalysis {
             times.append(next._1)
           }
 
-          /**
-            * 第一个参数：这一分钟的时间 2019-09-09 20:20
-            * 第二个参数：域名
-            * 第三个参数：traffic的和
-            */
+          /** 第一个参数：这一分钟的时间 2019-09-09 20:20 第二个参数：域名 第三个参数：traffic的和 */
           val time = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(times.max))
           out.collect((time, domain, sum))
         }
       })
 
+    //5.数据Sink写入ES
     val httpHosts = new java.util.ArrayList[HttpHost]
-    httpHosts.add(new HttpHost("192.168.199.233", 9200, "http"))
-
+    httpHosts.add(new HttpHost("master", 9200, "http"))
     val esSinkBuilder = new ElasticsearchSink.Builder[(String, String, Long)](
       httpHosts,
       new ElasticsearchSinkFunction[(String, String, Long)] {
+
         def createIndexRequest(element: (String, String, Long)): IndexRequest = {
           val json = new java.util.HashMap[String, Any]
           json.put("time", element._1)
           json.put("domain", element._2)
           json.put("traffics", element._3)
 
+          //保存到ES中的id
           val id = element._1 + "-" + element._2
-
           return Requests.indexRequest()
-            .index("cdn")
+            .index("cdn_project")
             .`type`("traffic")
             .id(id)
             .source(json)
