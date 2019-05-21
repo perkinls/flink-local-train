@@ -28,6 +28,8 @@
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.12</scala.version>
         <hadoop.version>2.8.1</hadoop.version>
+        <iheart.version>1.4.3</iheart.version>
+        <fastjson.version>1.2.7</fastjson.version>
     </properties>
 
     <dependencies>
@@ -144,6 +146,17 @@
             <classifier>jdk15</classifier>
         </dependency>
 
+        <dependency>
+            <groupId>com.iheart</groupId>
+            <artifactId>ficus_2.11</artifactId>
+            <version>${iheart.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+            <scope>${scope.type}</scope>
+        </dependency>
 
     </dependencies>
     <build>
