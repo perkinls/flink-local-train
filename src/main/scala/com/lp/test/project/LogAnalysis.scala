@@ -4,9 +4,11 @@ import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
 import org.apache.flink.api.common.functions.RuntimeContext
+import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.java.tuple.Tuple
-import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
+import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala.function.WindowFunction
@@ -43,6 +45,14 @@ object LogAnalysis {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     //设置事件时间作为flink处理的基准时间
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+//    //设置最少一次和恰一次处理语义
+//    env.enableCheckpointing(20000, CheckpointingMode.EXACTLY_ONCE)
+//
+//    env.getCheckpointConfig.enableExternalizedCheckpoints(
+//      CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION)
+//    //设置重启策略
+//    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, //5次尝试
+//      50000)) //每次尝试间隔50s
 
     val topic = "project_test"
     val properties = new Properties()
@@ -150,11 +160,9 @@ object LogAnalysis {
         }
       }
     )
-
+    //设置要为每个批量请求缓冲的最大操作数
     esSinkBuilder.setBulkFlushMaxActions(1)
-
     resultData.addSink(esSinkBuilder.build) //.setParallelism(5)
-
     env.execute("LogAnalysis")
   }
 }
