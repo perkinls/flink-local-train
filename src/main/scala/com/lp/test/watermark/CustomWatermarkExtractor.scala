@@ -14,6 +14,10 @@ class CustomWatermarkExtractor extends AssignerWithPeriodicWatermarks[JSONObject
 
   var currentTimestamp = Long.MinValue
 
+  /**
+    * waterMark生成器
+    * @return
+    */
   override def getCurrentWatermark: Watermark = {
 
     new Watermark(
@@ -24,6 +28,13 @@ class CustomWatermarkExtractor extends AssignerWithPeriodicWatermarks[JSONObject
     )
   }
 
+  /**
+    * 时间抽取
+    *
+    * @param element
+    * @param previousElementTimestamp
+    * @return
+    */
   override def extractTimestamp(element: JSONObject, previousElementTimestamp: Long): Long = {
 
     this.currentTimestamp = element.getLong("time")

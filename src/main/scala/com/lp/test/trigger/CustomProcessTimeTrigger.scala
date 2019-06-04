@@ -72,6 +72,15 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
     */
   override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE
 
+  /**
+    * 如果此触发器支持合并触发器状态，则返回true
+    *
+    * @return
+    */
+  override def canMerge() = {
+    true
+  }
+
   override def clear(window: TimeWindow, ctx: Trigger.TriggerContext) = ctx.deleteProcessingTimeTimer(window.maxTimestamp)
 
   /**

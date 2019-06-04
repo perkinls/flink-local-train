@@ -1,8 +1,7 @@
 package com.lp.test.source
 
-import java.util.Properties
-
 import com.lp.test.trigger.CustomProcessTimeTrigger
+import com.lp.test.utils.ConfigUtils
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -28,13 +27,13 @@ object KafkaSourceTest {
 
     //设置最少处理一次语义和恰好一次语义
     env.enableCheckpointing(20000, CheckpointingMode.AT_LEAST_ONCE)
+
     //checkpointing可以分开设置
     //env.enableCheckpointing(20000)
     //env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
 
     //设置checkpoint目录
     //env.setStateBackend(new FsStateBackend("/hdfs/checkpoint"));
-
     //设置checkpoint的清除策略
     env.getCheckpointConfig.enableExternalizedCheckpoints(
       CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION)
@@ -46,13 +45,9 @@ object KafkaSourceTest {
 
     //设置flink以身为时间为基准作，处理事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
-    val props = new Properties()
-    props.setProperty("bootstrap.servers", "master:9092")
-    props.setProperty("group.id", "test")
+    val kafkaConfig = ConfigUtils.apply("string")
 
-    val kafkaConsumer = new FlinkKafkaConsumer("fk_string_topic",
-      new SimpleStringSchema(),
-      props)
+    val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1, new SimpleStringSchema(), kafkaConfig._2)
       .setStartFromEarliest()
 
     import org.apache.flink.api.scala._

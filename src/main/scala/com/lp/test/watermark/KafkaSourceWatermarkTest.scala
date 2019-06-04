@@ -3,8 +3,9 @@ package com.lp.test.watermark
 import java.util.Properties
 
 import com.lp.test.serialization.KafkaEventSchema
+import com.lp.test.utils.ConfigUtils
 import net.sf.json.JSONObject
-import org.apache.flink.api.common.functions.{ReduceFunction}
+import org.apache.flink.api.common.functions.ReduceFunction
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
@@ -26,14 +27,10 @@ object KafkaSourceWatermarkTest {
 
     //设置事件事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    val props = new Properties()
-    props.setProperty("bootstrap.servers", "master:9092")
-    props.setProperty("group.id", "test")
 
-    val kafkaConsumer = new FlinkKafkaConsumer("fk_json_topic",
-      new KafkaEventSchema, //自定义反序列化器
-      props)
-    kafkaConsumer
+    val kafkaConfig = ConfigUtils.apply("json")
+
+    val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1, new KafkaEventSchema, kafkaConfig._2)
       .setStartFromEarliest()
       .assignTimestampsAndWatermarks(new CustomWatermarkExtractor) //设置自定义时间戳分配器和watermark发射器，也可以在后面的算子中设置
 
@@ -45,7 +42,7 @@ object KafkaSourceWatermarkTest {
       .keyBy(_.getString("fruit"))
       .window(TumblingEventTimeWindows.of(Time.seconds(10))) //滚动窗口，大小为10s
       .allowedLateness(Time.seconds(10)) //允许10秒延迟
-      .reduce(new ReduceFunction[JSONObject] { //进行reduce聚合操作
+      .reduce(new ReduceFunction[JSONObject] { //对json字符串中key相同的进行聚合操作
       override def reduce(value1: JSONObject, value2: JSONObject): JSONObject = {
         val json = new JSONObject()
         json.put("fruit", value1.getString("fruit"))

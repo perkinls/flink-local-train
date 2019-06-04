@@ -2,6 +2,7 @@ package com.lp.test.windows
 
 import java.util.Properties
 
+import com.lp.test.utils.ConfigUtils
 import org.apache.flink.api.common.functions.{ReduceFunction, RichMapFunction}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.TimeCharacteristic
@@ -12,7 +13,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 /**
   * <p/> 
-  * <li>Description: TODO</li>
+  * <li>Description: 滑动窗口</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-10 16:36</li> 
   */
@@ -25,13 +26,11 @@ object SlidingWindowsReduceFunction {
 
     //设置事件事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    val props = new Properties()
-    props.setProperty("bootstrap.server", "master:9092")
-    props.setProperty("group.id", "test")
+    val kafkaConfig = ConfigUtils.apply("kv")
 
-    val kafkaConsumer = new FlinkKafkaConsumer("fk_json_topic",
+    val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new SimpleStringSchema(), //自定义反序列化器
-      props)
+      kafkaConfig._2)
     kafkaConsumer
       .setStartFromLatest()
 

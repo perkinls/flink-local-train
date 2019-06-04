@@ -4,7 +4,7 @@ import org.apache.flink.streaming.api.functions.source.{ParallelSourceFunction, 
 
 /**
   * <p/> 
-  * <li>Description: TODO</li>
+  * <li>Description: 自定义source能够并行</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-04-15 20:05</li> 
   */
