@@ -14,7 +14,9 @@ import org.apache.flink.util.Collector
 
 /**
   * <p/> 
-  * <li>Description: TODO</li>
+  * <li>Description: 统计一个window中元素个数，此外，还将window的信息添加到输出中。</li>
+  * 使用ProcessWindowFunction来做简单的聚合操作，如:计数操作，性能是相当差的。
+  * 将ReduceFunction跟ProcessWindowFunction结合起来，来获取增量聚合和添加到ProcessWindowFunction中的信息，性能更好
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-10 16:35</li> 
   */
@@ -30,9 +32,7 @@ object TumblingWindowsProcessFunction {
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new SimpleStringSchema(),
-      kafkaConfig._2)
-      .setStartFromLatest()
-
+      kafkaConfig._2).setStartFromLatest()
 
     import org.apache.flink.api.scala._
     val process = env
@@ -64,15 +64,16 @@ object TumblingWindowsProcessFunction {
     */
   class MyProcessWindowFunction extends ProcessWindowFunction[(String, Long), String, String, TimeWindow] {
 
-    def process(key: String, context: Context, input: Iterable[(String, Long)], out: Collector[String]): () = {
+    def process(key: String, context: Context, input: Iterable[(String, Long)], out: Collector[String]) = {
       var count = 0L
       //ProcessWindowFunction对窗口中的数据元进行计数的情况
-      for (in <- input) {
+      for (in <- input)
         count = count + 1
-      }
+
       out.collect(s"Window ${context.window} count: $count")
     }
   }
+
   /**
     * 自定义触发器
     *
@@ -119,7 +120,7 @@ object TumblingWindowsProcessFunction {
       * @param ctx
       * @return
       */
-    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.CONTINUE
+    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE_AND_PURGE
 
     /**
       * 在注册的处理时间计时器触发时调用该方法
@@ -135,11 +136,13 @@ object TumblingWindowsProcessFunction {
 
     /**
       * 如果此触发器支持合并触发器状态，则返回true
+      *
       * @return
       */
-    override def canMerge()={
+    override def canMerge() = {
       true
     }
+
     /**
       * 该onMerge()方法与状态触发器相关，并且当它们的相应窗口合并时合并两个触发器的状态，例如当使用会话窗口时。
       *
@@ -157,4 +160,5 @@ object TumblingWindowsProcessFunction {
 
 
   }
+
 }

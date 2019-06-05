@@ -48,19 +48,21 @@ object SessionWindowsAggregate {
           (splits(0), splits(1).toLong)
         }
       })
-      .keyBy(0)
+      //      .keyBy(0)
       //.windowAll(ProcessingTimeSessionWindows.withGap(Time.seconds(10)))
       //.windowAll(EventTimeSessionWindows.withGap(Time.seconds(10)))
       .windowAll(ProcessingTimeSessionWindows.withDynamicGap(new SessionWindowTimeGapExtractor[(String, Long)] {
       override def extract(element: (String, Long)): Long = {
-        // 当发生不活动的间隙时间价格长度10s
-        10000
+        // 当发生不活动的间隙时间间隔长度2s
+        2000
       }
     }))
       .trigger(new CustomProcessTimeTrigger)
       .aggregate(new AverageAggregate)
 
+
     aggregate.print()
+
     env.execute("SessionWindowsAggregate")
 
   }
@@ -70,20 +72,57 @@ object SessionWindowsAggregate {
     * 自定义聚合函数
     */
   class AverageAggregate extends AggregateFunction[(String, Long), (Long, Long), Double] {
-    override def createAccumulator() = (0L, 0L)
 
-    override def add(value: (String, Long), accumulator: (Long, Long)) =
+    /**
+      * 创建一个新的累加器，启动一个新的聚合
+      *
+      * @return
+      */
+    override def createAccumulator() = {
+      print("触发: createAccumulator \t")
+      (0L, 0L)
+    }
+
+    /**
+      * 将给定的输入值添加到给定的累加器，返回new accumulator值
+      *
+      * @param value
+      * @param accumulator
+      * @return
+      */
+    override def add(value: (String, Long), accumulator: (Long, Long)) = {
+      print("触发: add  \t")
       (accumulator._1 + value._2, accumulator._2 + 1L)
+    }
 
-    override def getResult(accumulator: (Long, Long)) = accumulator._1 / accumulator._2
+    /**
+      * 从累加器获取聚合的结果
+      *
+      * @param accumulator
+      * @return
+      */
+    override def getResult(accumulator: (Long, Long)) = {
+      println("触发: getResult  \t")
+      accumulator._1 / accumulator._2
+    }
 
-    override def merge(a: (Long, Long), b: (Long, Long)) =
+    /**
+      * 合并两个累加器，返回具有合并状态的累加器
+      *
+      * @param a
+      * @param b
+      * @return
+      */
+    override def merge(a: (Long, Long), b: (Long, Long)) = {
+      println("触发: merge  \t")
       (a._1 + b._1, a._2 + b._2)
+    }
   }
 
 
   /**
     * 自定义触发器
+    * 触发器决定了一个窗口何时可以被窗口函数处理，每一个窗口分配器都有一个默认的触发器
     *
     * CONTINUE： 没做什么，
     * FIRE：触发​​计算，
@@ -95,7 +134,7 @@ object SessionWindowsAggregate {
     var flag = 0
 
     /**
-      * 进入窗口的每个元素都会调用该方法
+      * 每个元素被添加到窗口时调用
       *
       * @param element
       * @param timestamp
@@ -105,33 +144,36 @@ object SessionWindowsAggregate {
       */
     override def onElement(element: (String, Long), timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
 
-      //注册系统时间回调。当前系统时间超过指定时间
+      // 注册定时器，当系统时间到达window end timestamp时会回调该trigger的onProcessingTime方法
       ctx.registerProcessingTimeTimer(window.maxTimestamp)
       // CONTINUE是代表不做输出，也就是，此时我们想要实现比如10条输出一次，
       // 而不是窗口结束再输出就可以在这里实现。
-      if (flag > 9) {
+      if (flag > 5) {
         System.out.println("onElement : " + flag + "触发计算，保留Window内容")
         flag = 0
         TriggerResult.FIRE
       }
       else
         flag += 1
-      System.out.println("onElement : " + element)
+      System.out.println("onElement : " + flag + element)
       TriggerResult.CONTINUE
     }
 
     /**
-      * 在注册的事件时间计时器触发时调用该方法。
+      * 当一个已注册的处理时间计时器启动时调用
+      *
+      * 返回结果表示执行窗口计算并清空窗口
       *
       * @param time
       * @param window
       * @param ctx
       * @return
       */
-    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.CONTINUE
+    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =
+      TriggerResult.FIRE_AND_PURGE
 
     /**
-      * 在注册的处理时间计时器触发时调用该方法
+      * 当一个已注册的事件时间计时器启动时调用
       *
       * @param time
       * @param window
@@ -144,13 +186,15 @@ object SessionWindowsAggregate {
 
     /**
       * 如果此触发器支持合并触发器状态，则返回true
+      *
       * @return
       */
-    override def canMerge()={
+    override def canMerge() = {
       true
     }
+
     /**
-      * 该onMerge()方法与状态触发器相关，并且当它们的相应窗口合并时合并两个触发器的状态，例如当使用会话窗口时。
+      * 与状态性触发器相关，当使用会话窗口时，两个触发器对应的窗口合并时，合并两个触发器的状态。
       *
       * @param window
       * @param ctx

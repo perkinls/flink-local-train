@@ -1,7 +1,5 @@
 package com.lp.test.windows
 
-import java.util.Properties
-
 import com.lp.test.utils.ConfigUtils
 import org.apache.flink.api.common.functions.{ReduceFunction, RichMapFunction}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -13,7 +11,8 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 /**
   * <p/> 
-  * <li>Description: 滑动窗口</li>
+  * <li>Description: 滑动窗口内聚合</li>
+  *                  以第一个元素作为基准，窗口大小为10和滑动都为10
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-10 16:36</li> 
   */
@@ -30,9 +29,7 @@ object SlidingWindowsReduceFunction {
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new SimpleStringSchema(), //自定义反序列化器
-      kafkaConfig._2)
-    kafkaConsumer
-      .setStartFromLatest()
+      kafkaConfig._2).setStartFromLatest()
 
     import org.apache.flink.api.scala._
     val reduce = env
@@ -40,6 +37,7 @@ object SlidingWindowsReduceFunction {
       .map(new RichMapFunction[String, (String, Long)] {
         override def map(value: String): (String, Long) = {
           val splits = value.split(" ")
+          println((splits(0), splits(1).toLong))
           (splits(0), splits(1).toLong)
         }
       })

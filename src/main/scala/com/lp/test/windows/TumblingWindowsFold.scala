@@ -46,12 +46,7 @@ object TumblingWindowsFold {
       .keyBy(0)
       .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(10)))
       .trigger(new CustomProcessTimeTrigger)
-      .fold(""){(acc, v) => acc + v._2}
-//      .fold("", new FoldFunction[(String, Long), String] {
-//        override def fold(accumulator: String, value: (String, Long)): String = {
-//          accumulator + value._2
-//        }
-//      })
+      .fold("6"){(acc, v) => acc + v._2}
 
     fold.print()
     env.execute("TumblingWindowsFold")
@@ -105,7 +100,7 @@ object TumblingWindowsFold {
       * @param ctx
       * @return
       */
-    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.CONTINUE
+    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE_AND_PURGE
 
     /**
       * 在注册的处理时间计时器触发时调用该方法
