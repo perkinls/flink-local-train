@@ -79,7 +79,7 @@ object SessionWindowsAggregate {
       * @return
       */
     override def createAccumulator() = {
-      print("触发: createAccumulator \t")
+//      println("触发: createAccumulator \t")
       (0L, 0L)
     }
 
@@ -91,7 +91,7 @@ object SessionWindowsAggregate {
       * @return
       */
     override def add(value: (String, Long), accumulator: (Long, Long)) = {
-      print("触发: add  \t")
+//      println("触发: add  \t"+(accumulator._1 + value._2, accumulator._2 + 1L))
       (accumulator._1 + value._2, accumulator._2 + 1L)
     }
 
@@ -102,8 +102,8 @@ object SessionWindowsAggregate {
       * @return
       */
     override def getResult(accumulator: (Long, Long)) = {
-      println("触发: getResult  \t")
-      accumulator._1 / accumulator._2
+      println("触发: getResult 累加计算结果 \t"+accumulator._1)
+      accumulator._1
     }
 
     /**

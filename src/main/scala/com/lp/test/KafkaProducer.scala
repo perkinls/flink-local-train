@@ -21,7 +21,8 @@ object KafkaProducer {
   def main(args: Array[String]): Unit = {
 
     val props = new Properties()
-    props.setProperty("bootstrap.servers", "master:9092")
+    //    props.setProperty("bootstrap.servers", "master:9092")
+    props.setProperty("bootstrap.servers", "dn01.cechealth.cn:6667,dn02.cechealth.cn:6667,dn03.cechealth.cn:6667")
     props.setProperty("acks", "all")
     props.setProperty("retries", "0")
     props.setProperty("batch.size", "16384")
@@ -35,10 +36,10 @@ object KafkaProducer {
 
     //指定发送任意格式的数据到kafka
     for (e <- 0 until 100000) {
-//      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
-//      sendMsgJson(producer)
+      //      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
+      //      sendMsgJson(producer)
       sendMsgKv(producer)
-//      sendMsgEvent(producer)
+      //      sendMsgEvent(producer)
 
     }
 
@@ -79,15 +80,25 @@ object KafkaProducer {
     val arrayBuffer = Array[String]("apple", "pear", "nut", "grape", "banana", "pineapple", "pomelo", "orange")
 
     for (i <- 0 until 10) {
-      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
+
+      //join情况
+      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5) + " " + System.currentTimeMillis
       producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
-      println("first Kv:"+String.valueOf(i)+":======>"+ str)
-      str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
-      println("Second Kv_1:"+String.valueOf(i)+":======>"+str)
+      //测试join操作
       producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
+      println("first Kv:" + String.valueOf(i) + ":======>" + str)
+      println("Second Kv_1:" + String.valueOf(i) + ":======>" + str)
+
+      //非join情况
+      //      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
+      //      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
+      //      println("first Kv:" + String.valueOf(i) + ":======>" + str)
+      //      str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
+      //      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
+      //      println("Second Kv_1:" + String.valueOf(i) + ":======>" + str)
 
       try
-        sleep(2000)
+        sleep(1000)
       catch {
         case e: InterruptedException => e.printStackTrace()
       }

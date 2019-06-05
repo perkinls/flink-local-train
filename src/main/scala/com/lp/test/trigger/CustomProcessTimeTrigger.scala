@@ -63,14 +63,14 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
   override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.CONTINUE
 
   /**
-    * 事件时间time出发的时候被调用
+    * 窗口事件时间time end的时候被调用
     *
     * @param time
     * @param window
     * @param ctx
     * @return
     */
-  override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE
+  override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE_AND_PURGE
 
   /**
     * 如果此触发器支持合并触发器状态，则返回true
