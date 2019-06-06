@@ -18,6 +18,9 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 /**
   * <p/> 
   * <li>Description: window之间的join操作 </li>
+  *
+  * 注意：
+  * join必须依赖窗口及watermark操作
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-08 19:52</li> 
   */
@@ -77,22 +80,23 @@ object TumblingWindowJoin {
     val joinDs = operator1
       .join(operator2)
       .where(elem => elem._1)
-      .equalTo(elem => elem._1)
-      .window(TumblingEventTimeWindows.of(Time.milliseconds(5))) //窗口分配器定义程序
+      .equalTo(elem => elem._1)      //注意单位  注意单位！！！！！Time.minutes(1)
+      .window(TumblingEventTimeWindows.of(Time.minutes(1))) //窗口分配器定义程序
       .apply(new JoinFunction[(String, Long), (String, Long), (String, Long, Long)] {
       override def join(first: (String, Long), second: (String, Long)): (String, Long, Long) = {
         (first._1, first._2, second._2)
       }
     })
+//    joinDs.print("333")
 
     //设置触发器
-        joinDs
-          .keyBy(_._1)
-          .window(TumblingEventTimeWindows.of(Time.milliseconds(5)))
-          .trigger(new CustomProcessTimeTrigger)
-          .reduce((e1, e2) => {
-            (e1._1, e1._2 + e2._2, e1._3 + e2._3) //聚合操作
-          }).print()
+    joinDs
+      .keyBy(_._1)
+      .window(TumblingEventTimeWindows.of(Time.milliseconds(5)))
+      .trigger(new CustomProcessTimeTrigger)
+      .reduce((e1, e2) => {
+        (e1._1, e1._2 + e2._2, e1._3 + e2._3) //聚合操作
+      }).print()
 
     env.execute("TumblingWindowJoin")
 

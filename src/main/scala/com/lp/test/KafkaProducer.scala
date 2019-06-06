@@ -84,10 +84,12 @@ object KafkaProducer {
       //join情况
       var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5) + " " + System.currentTimeMillis
       producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
-      //测试join操作
+      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i) + "01", str))
       producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
-      println("first Kv:" + String.valueOf(i) + ":======>" + str)
-      println("Second Kv_1:" + String.valueOf(i) + ":======>" + str)
+      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i) + "02", str))
+
+      println("first  Kv:" + String.valueOf(i) + "-1" + ":======>" + str + "\t" + str)
+      println("Second Kv:" + String.valueOf(i) + "-2" + ":======>" + str + "\t" + str)
 
       //非join情况
       //      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
