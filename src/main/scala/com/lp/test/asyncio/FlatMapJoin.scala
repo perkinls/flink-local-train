@@ -1,6 +1,5 @@
 package com.lp.test.asyncio
 
-import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
@@ -9,7 +8,6 @@ import com.lp.test.utils.ConfigUtils
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
-import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}

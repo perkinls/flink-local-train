@@ -23,7 +23,6 @@ import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import scala.Tuple2;
 
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
