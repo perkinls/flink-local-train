@@ -1,14 +1,8 @@
 #### Flink的异步IO
 
-Async I/O 是阿里巴巴贡献给社区的一个呼声非常高的特性，于1.2版本引入。主要目的是为了解决与外部系统交互时网络延迟成为了系统瓶颈的问题。
+Async I/O 是阿里巴巴贡献给社区的一个呼声非常高的特性，于1.2版本引入。主要目的是为了解决与外部系统交互时网络延迟成为了系统瓶颈的问题。对于实时处理，当需要使用外部存储数据染色的时候，需要小心对待，不能让与外部系统之间的交互延迟对流处理的整个工作进度起决定性的影响。
 
-对于实时处理，当需要使用外部存储数据染色的时候，需要小心对待，不能让与外部系统之间的交互延迟对流处理的整个工作进度起决定性的影响。
-
-在mapfunction等算子里访问外部存储，实际上该交互过程是同步的：比如请求a发送到数据库，那么mapfunction会一直等待响应。在很多案例中，这个等待过程是非常浪费函数时间的。
-
-与数据库异步交互，意味着单个函数实例可以并发处理很多请求，同时并发接收响应。那么，等待时间由于发送其它请求和接收其它响应，被重复使用而节省了。至少，等待时间在多个请求上被摊销。这就使得很多使用案例具有更高的吞吐量。
-
-![https://pic2.zhimg.com/80/v2-c864741c3918893b4097bbcd8f0f2d61_hd.jpg](file:////Users/lipan/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image001.jpg)
+在mapfunction等算子里访问外部存储，实际上该交互过程是同步的：比如请求a发送到数据库，那么mapfunction会一直等待响应。在很多案例中，这个等待过程是非常浪费函数时间的。与数据库异步交互，意味着单个函数实例可以并发处理很多请求，同时并发接收响应。那么，等待时间由于发送其它请求和接收其它响应，被重复使用而节省了。至少，等待时间在多个请求上被摊销。这就使得很多使用案例具有更高的吞吐量。
 
 注意：通过增加MapFunction的到一个较大的并行度也是可以改善吞吐量的，但是这就意味着更高的资源开销：更多的MapFunction实例意味着更多的task，线程，flink内部网络连接，数据库的链接，缓存，更多内部状态开销。
 
@@ -24,21 +18,57 @@ flink异步IO的API支持用户在data stream中使用异步请求客户端。AP
 
 假如有目标数据库的异步客户端，使用异步IO，需要实现一下三步：
 
-​	实现AsyncFunction，该函数实现了请求分发的功能。
+- ​	实现AsyncFunction，该函数实现了请求分发的功能。
 
-​	一个callback回调，该函数取回操作的结果，然后传递给ResultFuture。
+- ​	一个callback回调，该函数取回操作的结果，然后传递给ResultFuture。
 
-​	对DataStream使用异步IO操作。
+- ​	对DataStream使用异步IO操作。
 
-代码例子：
+```
+/**
 
-```scala
-//todo ....
+ \* An implementation of the 'AsyncFunction' that sends requests and sets the callback.
+
+ */
+class AsyncDatabaseRequest extends AsyncFunction[String, (String, String)] {
+
+​    /** The database specific client that can issue concurrent requests with callbacks */
+
+​    lazy val client: DatabaseClient = new DatabaseClient(host, post, credentials)
+
+​    /** The context used for the future callbacks */
+
+​    implicit lazy val executor: ExecutionContext = ExecutionContext.fromExecutor(Executors.directExecutor())
+​    override def asyncInvoke(str: String, resultFuture: ResultFuture[(String, String)]): Unit = {
+​        // issue the asynchronous request, receive a future for the result
+
+​        val resultFutureRequested: Future[String] = client.query(str)
+
+ 
+
+​        // set the callback to be executed once the request by the client is complete
+
+​        // the callback simply forwards the result to the result future
+
+​        resultFutureRequested.onSuccess {
+
+​            case result: String => resultFuture.complete(Iterable((str, result)))
+​        }
+​    }
+}
+
+// create the original stream
+
+val stream: DataStream[String] = ...
+
+// apply the async I/O transformation
+
+val resultStream: DataStream[(String, String)] =
+
+​    AsyncDataStream.unorderedWait(stream, new AsyncDatabaseRequest(), 1000, TimeUnit.MILLISECONDS, 100)
 ```
 
-重要提示：
-
-第一次调用 ResultFuture.complete的时候 ResultFuture就会完成。所有后续的complete调用都会被忽略。
+**重要提示**：第一次调用 ResultFuture.complete的时候 ResultFuture就会完成。<u>**所有后续的complete调用都会被忽略。**</u>
 
 下面也有两个参数需要注意一下：
 
@@ -48,23 +78,19 @@ flink异步IO的API支持用户在data stream中使用异步请求客户端。AP
 
 2. Capacity
 
-该参数定义了同时最多有多少个异步请求在处理。即使异步IO的方式会导致更高的吞吐量，但是对于实时应用来说该操作也是一个瓶颈。限制并发请求数，算子不会积压过多的未处理请求，但是一旦超过容量的显示会触发背压。
+该参数定义了同时最多有多少个异步请求在处理。即使异步IO的方式会导致更高的吞吐量，但是对于实时应用来说该操作也是一个瓶颈。**限制并发请求数，算子不会积压过多的未处理请求，但是一旦超过容量的显示会触发背压。**
 
-3. 超时处理
+**超时处理**
 
 当一个异步IO请求多次超时，默认情况下会抛出一个异常，然后重启job。如果想处理超时，可以覆盖AsyncFunction#timeout方法。
 
-4. 结果的顺序
+**结果的顺序**
 
 AsyncFunction发起的并发请求完成的顺序是不可预期的。为了控制结果发送的顺序，flink提供了两种模式：
 
 1). Unordered
 
-结果记录在异步请求结束后立刻发送。流中的数据在经过该异步IO操作后顺序就和以前不一样了。当使用处理时间作为基础时间特性的时候，该方式具有极低的延迟和极低的负载。调用方式
-
-AsyncDataStream.unorderedWait(...)
-
-![https://pic2.zhimg.com/80/v2-ecb50046f84f4f71554f43a29316436d_hd.jpg](file:////Users/lipan/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image002.jpg)
+结果记录在异步请求结束后立刻发送。流中的数据在经过该异步IO操作后顺序就和以前不一样了。当使用处理时间作为基础时间特性的时候，该方式具有极低的延迟和极低的负载。调用方式AsyncDataStream.unorderedWait(...)
 
 2). Ordered
 
@@ -72,9 +98,7 @@ AsyncDataStream.unorderedWait(...)
 
 AsyncDataStream.orderedWait(...)
 
-![https://pic1.zhimg.com/80/v2-b102003825ad9f39550fc19a5bce5ddc_hd.jpg](file:////Users/lipan/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image003.jpg)
-
-5. 事件时间
+**事件时间**
 
 当使用事件时间的时候，异步IO操作也会正确的处理watermark机制。这就意味着两种order模式的具体操作如下：
 
@@ -84,16 +108,12 @@ watermark不会超过记录，反之亦然.意味着watermark建立了一个orde
 
 这就意味着在存在watermark的情况下，无序模式引入了一些与有序模式相同的延迟和管理开销。开销的大小取决于watermark的频率。
 
-![https://pic2.zhimg.com/80/v2-9e2dc7737b6092d29b93a14e893b91f9_hd.jpg](file:////Users/lipan/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image004.jpg)
-
 2). Ordered
 
 watermark的顺序就如记录的顺序一样被保存。与处理时间相比，开销没有显著变化。
 
 请记住，注入时间 Ingestion Time是基于源处理时间自动生成的watermark事件时间的特殊情况。
 
-![https://pic1.zhimg.com/80/v2-b102003825ad9f39550fc19a5bce5ddc_hd.jpg](file:////Users/lipan/Library/Group%20Containers/UBF8T346G9.Office/TemporaryItems/msohtmlclip/clip_image003.jpg)
-
-**6.** **容错担保**
+##### **容错担保**
 
 异步IO操作提供了仅一次处理的容错担保。它会将在传出的异步IO请求保存于Checkpoint，然后故障恢复的时候从Checkpoint中恢复这些请求。

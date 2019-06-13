@@ -98,7 +98,7 @@ object TumblingWindowsProcessFunction {
     override def onElement(element: (String, Long), timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
 
       //注册系统时间回调。当前系统时间超过指定时间
-      ctx.registerProcessingTimeTimer(window.maxTimestamp)
+      ctx.registerEventTimeTimer(window.maxTimestamp)
       // CONTINUE是代表不做输出，也就是，此时我们想要实现比如10条输出一次，
       // 而不是窗口结束再输出就可以在这里实现。
       if (flag > 9) {

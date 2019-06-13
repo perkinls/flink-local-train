@@ -23,6 +23,8 @@
     </repositories>
 
     <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flink.version>1.7.2</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
@@ -71,12 +73,17 @@
             <artifactId>flink-connector-kafka_2.11</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch6_2.11</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-json -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-json</artifactId>
@@ -99,6 +106,13 @@
             <artifactId>vertx-redis-client</artifactId>
             <version>3.5.2.CR3</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.bahir/flink-connector-redis -->
+        <dependency>
+            <groupId>org.apache.bahir</groupId>
+            <artifactId>flink-connector-redis_2.11</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!--缓存相关依赖-->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -203,8 +217,8 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
 
+            </plugin>
 
             <!-- Scala Compiler -->
             <plugin>
@@ -224,7 +238,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
+                <version>1.8</version>
                 <executions>
                     <!-- Add src/main/scala to eclipse build path -->
                     <execution>

@@ -1,13 +1,13 @@
 package com.lp.test.sideoutputs
 
-import java.util.Properties
-
 import com.lp.test.serialization.KafkaEventSchema
-import com.lp.test.watermark.CustomWatermarkExtractor
+import com.lp.test.utils.ConfigUtils
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.functions.ReduceFunction
 import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.scala.{OutputTag, StreamExecutionEnvironment}
+import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
@@ -15,7 +15,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 /**
   * <p/> 
-  * <li>Description: 使用侧输出解决延迟数据</li>
+  * <li>Description: 侧输出解决延迟数据</li>
   * <li>@author: lipan@cechealth.cn</li> 
   * <li>Date: 2019-05-10 13:48</li> 
   */
@@ -29,14 +29,12 @@ object LateDataSideOut {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     //选择设置事件时间和处理事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
-    val props = new Properties()
-    props.setProperty("bootstrap.servers", "master:9092")
-    props.setProperty("group.id", "test")
+    val kafkaConfig = ConfigUtils.apply("json")
 
-    val kafkaConsumer = new FlinkKafkaConsumer("joinTest",
+    val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new KafkaEventSchema(), //自定义反序列化器
-      props)
-      .setStartFromEarliest() //从最新的offset开始消费消息
+      kafkaConfig._2)
+      .setStartFromLatest()
       .assignTimestampsAndWatermarks(new CustomWatermarkExtractor) //设置自定义时间戳分配器和watermark发射器
 
     import org.apache.flink.api.scala._
@@ -63,5 +61,39 @@ object LateDataSideOut {
 
     env.execute("LateDataSideOut")
   }
+
+  class CustomWatermarkExtractor extends AssignerWithPeriodicWatermarks[JSONObject] {
+
+    var currentTimestamp = Long.MinValue
+
+    /**
+      * waterMark生成器
+      *
+      * @return
+      */
+    override def getCurrentWatermark: Watermark = {
+
+      new Watermark(
+        if (currentTimestamp == Long.MinValue)
+          Long.MinValue
+        else
+          currentTimestamp - 1
+      )
+    }
+    /**
+      * 时间抽取
+      *
+      * @param element
+      * @param previousElementTimestamp
+      * @return
+      */
+    override def extractTimestamp(element: JSONObject, previousElementTimestamp: Long): Long = {
+
+      this.currentTimestamp = element.getLong("time")
+
+      currentTimestamp
+    }
+  }
+
 
 }

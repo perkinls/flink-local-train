@@ -182,6 +182,11 @@ object SessionWindowsAggregate {
       */
     override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE
 
+    /**
+      * 清除触发器可能仍为给定窗口保留的任何状态。
+      * @param window
+      * @param ctx
+      */
     override def clear(window: TimeWindow, ctx: Trigger.TriggerContext) = ctx.deleteProcessingTimeTimer(window.maxTimestamp)
 
     /**

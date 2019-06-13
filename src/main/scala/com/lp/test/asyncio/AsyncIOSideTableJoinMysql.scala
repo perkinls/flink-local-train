@@ -1,22 +1,23 @@
 //package com.lp.test.asyncio
 //
 //import java.util
+//import java.util.Collections
 //import java.util.concurrent.TimeUnit
-//import java.util.{Collections, Properties}
 //
 //import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
-//import com.lp.test.serialization.KafkaEventSchema
+//import com.lp.test.utils.ConfigUtils
 //import io.vertx.core.json.JsonObject
 //import io.vertx.core.{AsyncResult, Handler, Vertx, VertxOptions}
 //import io.vertx.ext.jdbc.JDBCClient
 //import io.vertx.ext.sql.{ResultSet, SQLConnection}
 //import net.sf.json.JSONObject
 //import org.apache.flink.api.common.restartstrategy.RestartStrategies
+//import org.apache.flink.api.common.serialization.{DeserializationSchema, SerializationSchema}
+//import org.apache.flink.api.common.typeinfo.TypeInformation
 //import org.apache.flink.configuration.Configuration
-//import org.apache.flink.streaming.api.datastream.AsyncDataStream
-//import org.apache.flink.streaming.api.environment.CheckpointConfig
+//import org.apache.flink.streaming.api.datastream.{AsyncDataStream, DataStream}
+//import org.apache.flink.streaming.api.environment.{CheckpointConfig, StreamExecutionEnvironment}
 //import org.apache.flink.streaming.api.functions.async.{ResultFuture, RichAsyncFunction}
-//import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 //import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 //import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 //
@@ -25,6 +26,18 @@
 //  * <li>Description: 异步IO写入mysql数据库</li>
 //  * <li>@author: lipan@cechealth.cn</li> 
 //  * <li>Date: 2019-05-15 13:42</li> 
+//  * 异步IO三步曲：
+//  *     1.AsyncFunction的一个实现，用来分派请求
+//  *     2.获取操作结果并将其传递给ResultFuture的回调
+//  *     3.将异步I/O操作作为转换应用于DataStream
+//  * 注意：
+//  * vertx目前只支持scala 2.12的版本,该demo不能编译通过，请参考java版本
+//  * <dependency>
+//  * <groupId>io.vertx</groupId>
+//  * <artifactId>vertx-lang-scala_2.12</artifactId>
+//  * <version>3.5.4</version>
+//  * </dependency>
+//  *
 //  */
 //object AsyncIOSideTableJoinMysql {
 //  def main(args: Array[String]): Unit = {
@@ -43,38 +56,36 @@
 //    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, //5次尝试
 //      50000)) //每次尝试间隔50s
 //    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
-//    val props = new Properties()
-//    props.setProperty("bootstrap.servers", "master:9092")
-//    props.setProperty("group.id", "TumblingWindowJoin")
+//    val kafkaConfig = ConfigUtils.apply("json")
 //
-//    val kafkaConsumer = new FlinkKafkaConsumer("fk_json_topic",
-//      new KafkaEventSchema, //自定义反序列化器
-//      props)
-//      .setStartFromLatest()
+//    val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
+//      new JSONEventSchema, //自定义反序列化器
+//      kafkaConfig._2)
 //
-//    import org.apache.flink.api.scala._
+//
+//    //注意DataStream的包 org.apache.flink.streaming.api.datastream
 //    val source: DataStream[JSONObject] = env.addSource(kafkaConsumer)
 //
-//    val asyncFunction = new SampleAsyncFunction
+//    //进行异步IO操作
 //    val result = if (true) {
-//      AsyncDataStream.orderedWait(source[JSONObject],
-//        asyncFunction,
-//        1000000L,   //异步请求超时时间
+//      AsyncDataStream.orderedWait(source,
+//        new SampleAsyncFunction,
+//        1000000L, //异步请求超时时间
 //        TimeUnit.MILLISECONDS,
-//        20)   //异步请求容量
+//        20) //异步请求容量
 //        .setParallelism(1)
 //    } else {
-//      AsyncDataStream.unorderedWait(source[JSONObject],
-//        asyncFunction,
-//        1000000L,    //异步请求超时时间
+//      AsyncDataStream.unorderedWait(source,
+//        new SampleAsyncFunction,
+//        1000000L, //异步请求超时时间
 //        TimeUnit.MILLISECONDS,
-//        20)   //异步请求容量
+//        20) //异步请求容量
 //        .setParallelism(1)
 //    }
 //
 //    result.print()
 //
-//    env.execute("AsyncIOSideTableJoinMysql")
+//    env.execute("AsyncIoSideTableJoinMysqlJava")
 //
 //  }
 //
@@ -83,6 +94,7 @@
 //    */
 //  class SampleAsyncFunction extends RichAsyncFunction[JSONObject, JSONObject] {
 //
+//    //mySQLClient就是在可序列化对象里某些成员在序列化时不被序列化
 //    @transient var mySQLClient: JDBCClient = _
 //    var cache: Cache[String, String] = _
 //
@@ -97,7 +109,8 @@
 //        .newBuilder()
 //        .maximumSize(1025)
 //        .expireAfterAccess(10, TimeUnit.MINUTES)
-//        .build()
+//        .build[String, String]
+//
 //      val mysqlConfig = new JsonObject()
 //        .put("url", "jdbc:mysql://localhost:3306/test")
 //        .put("driver_class", "com.mysql.jdbc.Driver")
@@ -109,8 +122,10 @@
 //      vo.setEventLoopPoolSize(10)
 //      vo.setWorkerPoolSize(20)
 //
-//      val vt = Vertx.vertx(vo)
-//      mySQLClient = JDBCClient.createNonShared(vt, mysqlConfig)
+//      //      val vt = Vertx.vertx(vo)
+//      //创建一个维护自己的数据源的JDBC客户端。
+//      val vertx: Vertx = GetVertx.getTx()
+//      mySQLClient = JDBCClient.createNonShared(vertx, mysqlConfig)
 //
 //    }
 //
@@ -162,19 +177,22 @@
 //
 //              if (event.succeeded()) { //成功情况下
 //                val rs = event.result()
+//
 //                val rows: util.List[JsonObject] = rs.getRows
 //                if (rows.size() <= 0) {
 //                  resultFuture.complete(null)
 //                  return
 //                }
-//                import scala.collection.JavaConversions._
-//                rows.foreach(e => {
+//
+//                import scala.collection.JavaConverters._
+//                rows.asScala.foreach(e => {
 //                  val desc = e.getString("docs")
 //                  input.put("docs", desc)
 //                  cache.put(key, desc)
+//                  resultFuture.complete(Collections.singleton(input))
 //                })
 //
-//              } else {  //异常的情况，不进行处理会阻塞
+//              } else { //异常的情况，不进行处理会阻塞
 //                resultFuture.complete(null)
 //              }
 //
@@ -188,6 +206,24 @@
 //        }
 //      })
 //
+//    }
+//  }
+//
+//  class JSONEventSchema extends DeserializationSchema[JSONObject] with SerializationSchema[JSONObject] {
+//
+//    override def deserialize(message: Array[Byte]): JSONObject = {
+//      JSONObject.fromObject(new String(message))
+//    }
+//
+//    override def isEndOfStream(nextElement: JSONObject): Boolean = false
+//
+//    override def serialize(element: JSONObject): Array[Byte] = {
+//      element.toString().getBytes()
+//    }
+//
+//    override def getProducedType: TypeInformation[JSONObject] = {
+//
+//      TypeInformation.of(classOf[JSONObject])
 //    }
 //  }
 //
