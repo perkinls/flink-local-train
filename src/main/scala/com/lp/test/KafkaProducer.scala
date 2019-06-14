@@ -36,11 +36,18 @@ object KafkaProducer {
 
     //指定发送任意格式的数据到kafka
     for (e <- 0 until 100000) {
-      //      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
+
+
+      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(10))))
       //      sendMsgJson(producer)
-      sendMsgKv(producer)
+//      sendMsgKv(producer)
       //      sendMsgEvent(producer)
 
+      try
+        sleep(1000)
+      catch {
+        case e: InterruptedException => e.printStackTrace()
+      }
     }
 
   }

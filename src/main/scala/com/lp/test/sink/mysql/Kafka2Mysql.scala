@@ -22,7 +22,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
   * <li>@author: li.pan</li> 
   * <li>Date: 2019-06-14 13:12</li> 
   * <li>Version: V1.0</li> 
-  * 未测试，代码仅供参考
+  *  需要手动建表（不建表,未报错）
   */
 object Kafka2Mysql {
   def main(args: Array[String]): Unit = {
@@ -53,21 +53,23 @@ object Kafka2Mysql {
     val kafkaConfig = ConfigUtils.apply("string")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1, new SimpleStringSchema(), kafkaConfig._2)
-      .setStartFromEarliest()
+      .setStartFromLatest()
 
     import org.apache.flink.api.scala._
     val windowStream: AllWindowedStream[Int, TimeWindow] = env
       .addSource(kafkaConsumer)
       .map(new RichMapFunction[String, Int] {
         override def map(value: String): Int = {
-
           Integer.valueOf(value)
         }
       })
       .timeWindowAll(Time.seconds(20))
       .trigger(new CustomProcessTimeTrigger)
+    windowStream.min(0).print("1234")
 
     val sum: DataStream[Int] = windowStream.sum(0)
+
+    sum.print("xxxxxxx")
     sum.addSink(new CustomJdbcSink)
 
     env.execute("Kafka2Mysql")
@@ -76,7 +78,6 @@ object Kafka2Mysql {
   /**
     * 自定义sink写入mysql
     */
-  @SerialVersionUID(99L)
   class CustomJdbcSink extends RichSinkFunction[Int] {
 
     var conn: Connection = _
@@ -85,19 +86,29 @@ object Kafka2Mysql {
     /**
       * open方法是初始化方法，会在invoke方法之前执行，执行一次。
       */
+    @throws
     override def open(parameters: Configuration): Unit = {
+      println("调用open方法")
       //随便写一张表
       Class.forName("com.mysql.jdbc.Driver")
       conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "1234")
       val sql = s"insert into kafka_sum(total) values (?)"
-      ps = conn.prepareStatement(sql)
-    }
 
+      println(s"$conn 执行mysql写操作")
+      ps = conn.prepareStatement(sql)
+      super.open(parameters)
+    }
 
     @throws
     override def invoke(value: Int, context: SinkFunction.Context[_]): Unit = {
-      ps.setInt(1, value)
-      ps.executeUpdate()
+      try {
+        ps.setInt(1, value)
+        ps.executeUpdate()
+        println("执行完成")
+      } catch {
+        case e: Exception => e.toString
+      }
+
     }
 
     @throws
@@ -106,6 +117,7 @@ object Kafka2Mysql {
         ps.close()
       if (conn != null)
         conn.close()
+      super.close()
     }
   }
 

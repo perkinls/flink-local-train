@@ -48,7 +48,7 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
       TriggerResult.FIRE
     }
     else flag += 1
-    System.out.println("onElement : " + element)
+//    System.out.println("onElement : " + element)
     TriggerResult.CONTINUE
   }
 
@@ -60,7 +60,7 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
     * @param ctx
     * @return
     */
-  override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.CONTINUE
+  override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE_AND_PURGE
 
   /**
     * 窗口事件时间time end的时候被调用

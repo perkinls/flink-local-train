@@ -45,7 +45,7 @@
 
   [代码实现及相关文档](/src/main/scala/com/lp/test/join)
 
-- Sink操作（hbase、mysql、redis）   待更新。。。。。。
+- Sink操作（hbase、mysql、redis）
 
   [代码实现及相关文档](/src/main/scala/com/lp/test/sink)
 
