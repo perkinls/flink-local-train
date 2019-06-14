@@ -23,7 +23,7 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.{RedisCommand, 
   * <li>Version: V1.0</li> 
   * 未测试，代码仅供参考
   */
-class Kafka2Redis {
+object Kafka2Redis {
 
   def main(args: Array[String]): Unit = {
     //获取flink流式运行环境
