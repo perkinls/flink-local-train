@@ -21,7 +21,7 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.{RedisCommand, 
   * <li>@author: li.pan</li> 
   * <li>Date: 2019-06-14 13:44</li> 
   * <li>Version: V1.0</li> 
-  * 未测试，代码仅供参考
+  * redis中会自动新建key
   */
 object Kafka2Redis {
 
@@ -52,7 +52,7 @@ object Kafka2Redis {
     val kafkaConfig = ConfigUtils.apply("string")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1, new SimpleStringSchema(), kafkaConfig._2)
-      .setStartFromEarliest()
+      .setStartFromLatest()
 
     import org.apache.flink.api.scala._
     val windowStream: AllWindowedStream[Int, TimeWindow] = env

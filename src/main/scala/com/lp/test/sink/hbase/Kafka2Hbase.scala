@@ -19,6 +19,7 @@ import org.apache.hadoop.hbase.util.Bytes
   * <li>@author: li.pan</li> 
   * <li>Date: 2019-06-14 13:55</li> 
   * <li>Version: V1.0</li> 
+  * 代码仅供参考
   */
 object Kafka2Hbase {
   def main(args: Array[String]): Unit = {
