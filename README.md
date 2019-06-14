@@ -45,11 +45,11 @@
 
   [代码实现及相关文档](/src/main/scala/com/lp/test/join)
 
-- Sink操作（hbase、mysql、redis）
+- Sink操作（hbase、mysql、redis）   待更新。。。。。。
 
   [代码实现及相关文档](/src/main/scala/com/lp/test/sink)
 
-- 状态管理
+- 状态管理    待更新。。。
 
   [代码实现及相关文档](/src/main/scala/com/lp/test/state)
 
