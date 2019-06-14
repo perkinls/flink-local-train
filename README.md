@@ -54,6 +54,6 @@
   [代码实现及相关文档](/src/main/scala/com/lp/test/state)
 
 #### 2.项目实战
-  ![](/pic/WX20190614-123737@2x.png)
+  ![](/src/main/resources/pic/WX20190614-123737@2x.png)
   
   [代码实现及相关文档](/src/main/scala/com/lp/test/project)
