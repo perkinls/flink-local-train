@@ -8,7 +8,6 @@ package com.lp.test.process
   * <li>Version: V1.0</li> 
   */
 class CountWithTimestamp() {
-
   var key: String = _
   var count: Long = _
   var lastModified: Long = _

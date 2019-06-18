@@ -20,6 +20,15 @@ import org.apache.flink.util.Collector
   * <li>@author: li.pan</li> 
   * <li>Date: 2019-06-14 20:43</li> 
   * <li>Version: V1.0</li> 
+  * 侧输出和滚动窗口中使用过
+  * 测试方法：
+  * 先开启producer 跑一会儿，然后停掉producer，过一分钟以后启动，因为我们采用的时间是注入时间，所以过一分钟之后发数据
+  * 事件时间大于1分钟，结果才会输出。
+  * 也可以设计某一个key，每隔1.5分钟发一次，这样就可以看到结果输出了
+  * 实际上该例子就是实现了会话窗口的功能。
+  *
+  * https://www.jianshu.com/p/e6297fac67cb
+  *
   */
 object ProcessFunctionTimeOut {
   def main(args: Array[String]): Unit = {
@@ -71,7 +80,7 @@ object ProcessFunctionTimeOut {
     */
   class CountWithTimeoutFunction extends ProcessFunction[(String, Long), (String, Long)] {
 
-    //保留函数的所有状态
+    //保留处理函数内部的所有状态 一个并行度
     var state: ValueState[CountWithTimestamp] = _
 
     override def open(parameters: Configuration): Unit = {
@@ -79,10 +88,14 @@ object ProcessFunctionTimeOut {
     }
 
     /**
-      * 针对每一个元素跟新状态
+      * 针对每一个元素会调用该方法，根据相关逻辑去更改内部状态
+      * （processElement其实是更新内部状态和注册TimerService）
       *
       * @param value
-      * @param ctx
+      * @param ctx 上下文(Context)对象,这个对象能访问到所处理元素事件时间的时间戳还有定时服务器(TimerService)
+      *            为尚未发生的处理时间或事件时间实例注册回调函数。当一个定时器到达特定的时间实例时，onTimer(...)
+      *            方法就会被调用。在这个函数的调用期间，所有的状态(states)都会再次对应定时器被创建时key所属的states，
+      *            同时被触发的回调函数也能操作这些状态。
       * @param out
       */
     override def processElement(value: (String, Long),
@@ -103,7 +116,7 @@ object ProcessFunctionTimeOut {
       // set the state's timestamp to the record's assigned event time timestamp
       current.lastModified = ctx.timestamp
 
-      // write the state back
+      // 对当前key进行状态更新
       state.update(current)
 
       // schedule the next timer 60 seconds from the current event time
@@ -116,7 +129,8 @@ object ProcessFunctionTimeOut {
     }
 
     /**
-      * 当超时时间到时会调用onTimer方法输出
+      * 计时器，当计时器时间到超时时间到时会调用onTimer方法输出
+      * （onTime的功能是输出逻辑判断）
       *
       * @param timestamp
       * @param ctx
