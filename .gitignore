@@ -35,5 +35,6 @@ doc
 rebel*.xml
 metastore_db
 _config.yml
+*.iml
 
 */target
