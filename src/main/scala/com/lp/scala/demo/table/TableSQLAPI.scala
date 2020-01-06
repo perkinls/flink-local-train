@@ -23,7 +23,6 @@ object TableSQLAPI {
 
     // 已经拿到DataSet
     val csv = env.readCsvFile[SalesLog](filePath,ignoreFirstLine=true)
-    //csv.print()
 
     // DataSet ==> Table
     val salesTable = tableEnv.fromDataSet(csv)
