@@ -20,6 +20,7 @@ hs_err_pid*
 *.jar
 *.war
 *.ear
+/*.iml
 *.iml
 /.idea
 .idea/
@@ -35,6 +36,3 @@ doc
 rebel*.xml
 metastore_db
 _config.yml
-*.iml
-
-*/target
