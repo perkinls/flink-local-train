@@ -39,11 +39,11 @@ public class KafkaSourceApp {
 //		env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
 //		设置checkpoint目录
 //		env.setStateBackend(new FsStateBackend("/hdfs/checkpoint"));
-
-        // checkpoint的清楚策略
-        env.getCheckpointConfig()
-                .enableExternalizedCheckpoints(CheckpointConfig.
-                        ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+//
+//        // checkpoint的清楚策略
+//        env.getCheckpointConfig()
+//                .enableExternalizedCheckpoints(CheckpointConfig.
+//                        ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
         /**
          * 设置重启策略/5次尝试/每次尝试间隔50s
@@ -59,7 +59,8 @@ public class KafkaSourceApp {
                 new FlinkKafkaConsumer(kafkaConfig._1, new SimpleStringSchema(), kafkaConfig._2)
                 .setStartFromLatest();
 
-        AllWindowedStream<Integer, TimeWindow> stream = env
+        AllWindowedStream<Integer, TimeWindow> stream =
+                env
                 .addSource(kafkaConsumer)
                 .map(new String2Integer())
                 .timeWindowAll(Time.seconds(20))

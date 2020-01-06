@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.source;
+package com.lp.java.demo.datastream.state;
 
 import org.apache.flink.streaming.api.checkpoint.ListCheckpointed;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
@@ -6,6 +6,10 @@ import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunctio
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Stateful Source案例
+ * https://blog.csdn.net/shenshouniu/article/details/84453692
+ */
 public class CounterSource extends RichParallelSourceFunction<Long> implements ListCheckpointed<Long> {
 
     /**  current offset for exactly once semantics */

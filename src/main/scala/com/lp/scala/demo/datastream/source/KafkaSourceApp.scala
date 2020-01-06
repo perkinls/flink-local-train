@@ -5,6 +5,7 @@ import com.lp.scala.demo.utils.ConfigUtils
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.runtime.jobgraph.JobVertex
 import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -61,15 +62,16 @@ object KafkaSourceApp {
         }
       })
       .timeWindowAll(Time.seconds(20))
-      .trigger(new CustomProcessTimeTrigger)  //10个元素触发一次计算
+      .trigger(new CustomProcessTimeTrigger) //10个元素触发一次计算
 
     stream.sum(0).print()
 
-//    val vertices: util.Iterator[JobVertex] = env.getStreamGraph.getJobGraph().getVertices.iterator()
-//    while (vertices.hasNext) {
-//      val value = vertices.next()
-//      println("NAME======>" + value.getName)
-//      println("ID======>" + value.getID)
+    // 获取JobGraph
+//    val vertices = env.getStreamGraph.getJobGraph.getVertices
+//    import scala.collection.JavaConversions._
+//    for (vertex <- vertices) {
+//      System.out.println("=====>" + vertex.getName)
+//      System.out.println("=====>" + vertex.getID)
 //    }
     env.execute("KafkaSourceTest")
 

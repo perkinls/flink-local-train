@@ -33,8 +33,8 @@ object KafkaProducer {
 
     //指定发送任意格式的数据到kafka
     while (true) {
-//      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(100))))
-      sendMsgJson(producer)
+      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(100))))
+//      sendMsgJson(producer)
       //      sendMsgKv(producer)
       //      sendMsgEvent(producer)
       try {

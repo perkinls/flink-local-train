@@ -4,6 +4,14 @@
 >
 > 代码涵盖Java和Scala版本（因笔者时间和能力有限，代码仅供参考，如有错误的地方请多多指证）。好手不敌双拳，双拳不如四手！希望和大家一起成长、共同进步！
 
+DataStream测试kafka的生产者为统一的类，[KafkaProducer](/src/main/scala/com/lp/scala/demo/KafkaProducer.scala)可以指定不同的方法分别发送string、json、k/v格式数据。
+
+### Quick Start
+
+在数据处理领域，WordCount就是HelloWorld。Flink自带WordCount例子，它通过socket读取text数据，并且统计每个单词出现的次数。
+
+WordCount案例：[Java](/src/main/java/com/lp/java/demo/quickstart)  [Scala](/src/main/scala/com/lp/scala/demo/quickstart)
+
 ## 1、基本API
 
 ![img](/src/main/resources/pic/16acf2d994f3cb2e.png)
@@ -113,11 +121,19 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### DataStream Kafka Source
 
-// TODO 等待更新中…...
+Flink提供了特殊的`Kafka connector`，用于从Kafka主题读写数据。 Flink `Kafka Consumer`与Flink的检查点(`checkpoint`)机制集成在一起，以提供**有且仅有一次**的语义。为此，Flink不仅仅依赖于Kafka的消费者群体偏移量跟踪，还内部跟踪和检查这些偏移量。
 
-### 自定义反列化器
+在真实的生产环境上，我们都需要保证系统的高可用。即需要保证系统的各个组件不能出现问题，或者提供一系列的容错机制。启用Flink的检查点后，`Flink Kafka Consumer`将在一个topic消费记录的时候，并以一致的方式定期记录Kafka偏移量和其它操作者的操作到检查点。万一作业失败，Flink将把流式程序恢复到最新检查点的状态，并从检查点中存储的偏移量开始重新使用Kafka的记录。
 
-// TODO 等待更新中…...
+| Kafka版本                | 执行语义                                                     |
+| ------------------------ | ------------------------------------------------------------ |
+| Kafka 0.8                | 在0.9之前Kafka没有提供任何机制去保证至少一次和仅仅一次的语义 |
+| Kafka 0.9 and Kafka 0.10 | 0.9和0.10至少具有**一次语义**的保证，其中`setLogFailureOnly`设置为false，`setFlushOnCheckpoint`设置为true。 |
+| Kafka 0.11 and newer     | 启用Flink的检查点后，FlinkKafkaProducer011（适用于Kafka> = 1.0.0版本的FlinkKafkaProducer）可以提供**有且仅有一次**语义的保证。 |
+
+可参考文章：https://blog.csdn.net/u013076044/article/details/102651473
+
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/source/KafkaSourceApp.java)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/source/KafkaSourceApp.scala)
 
 ### Event Time与WaterMark
 
