@@ -60,7 +60,7 @@ Flink中每一个Table & Sql程序大致包含以下流程：
 - step 5 : 输出表（Output table）结果发送到外部系统
 ```
 
-代码案例：等待更新…...
+代码案例：// TODO 等待更新中…...
 
 ## 2、常用特性
 
@@ -104,7 +104,7 @@ Flink中分布式缓存开发步骤大致如下：
 - step 2 : 通过RichFunction函数使用文件
 
 注意：
-在用户函数中访问缓存文件或者目录。这个函数必须继承RichFunction,因为它需要使用RuntimeContext读取数据:
+在用户函数中访问缓存文件或者目录。这个函数必须继承RichFunction,因为它需要使用RuntimeContext读取数据。
 ```
 
 累加器和分布式缓存或者更多相关文章可参考笔者[博客](http://www.lllpan.top/article/40)：http://www.lllpan.top/article/40
@@ -113,19 +113,19 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### DataStream Kafka Source
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### 自定义反列化器
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### Event Time与WaterMark
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### 触发器Trigger
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### 侧输出
 
@@ -134,31 +134,46 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### 异步IO
 
-快马加鞭中……...
+Flink的`Async I/O API`允许用户将异步请求客户端与数据流一起使用。API处理与数据流的集成，以及处理顺序，事件时间，容错等。正确的实现flink的异步IO功能，需要所连接的数据库支持异步客户端。幸运的是很多流行的数据库支持这样的客户端。
+
+Flink中`异步I/O`的开发步骤大致如下：
+
+```
+- step 1 : 实现AsyncFunction，该函数实现了请求分发的功能。
+- step 2 : Callback回调，该函数取回操作的结果，然后传递给ResultFuture。
+- step 3 : 对DataStream使用异步IO操作。
+```
+
+异步I/O详细介绍或者更多相关文章可参考笔者[博客](http://www.lllpan.top/article/45)：http://www.lllpan.top/article/45
+
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/asyncio)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/asyncio)
 
 ### 不同数据流join
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### DataStream Sink
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ## 3、高级应用
 
 ### ProcessFunction
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ### 状态管理
 
-快马加鞭中……...
+// TODO 等待更新中…...
 
 ## 4、项目案例
 
-### 项目背景
+### 项目描述
 
-快马加鞭中……...
+通过Mock程序模拟产生用户日志数据实时推送到Kafka消息队列，使用Flink对原始日志数据进行清洗、加工、计算后分别统计：
+
+- 最近一分钟每个域名产生的流量
+- 一分钟内每个用户产生的流量（其中域名和用户有对应关系，数据存放于关系型数据库中）
 
 ### 架构
 
@@ -166,4 +181,4 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### 代码实现
 
-快马加鞭中……...
+// TODO 等待更新中…...
