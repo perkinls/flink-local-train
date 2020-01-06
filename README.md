@@ -6,13 +6,13 @@
 >
 > 代码涵盖Java和Scala版本（因笔者时间和能力有限，代码仅供参考，如有错误的地方请多多指证）。好手不敌双拳，双拳不如四手！希望和大家一起成长、共同进步！
 
-![img](/Users/lipan/app/typora-pic/486074-20190710082602165-1980494462.png)
+![img](/src/main/resources/pic/486074-20190710082602165-1980494462.png)
 
 ## 1、基本API
 
-![img](/Users/lipan/app/typora-pic/16acf2d994f3cb2e.png)
+![img](/src/main/resources/pic/16acf2d994f3cb2e.png)
 
-以上为Flink的运行模型（和Spark基本一致），Flink的程序主要由三部分构成，分别为Source、Transformation、Sink。DataSource主要负责数据的读取，Transformation主要负责对属于的转换操作，Sink负责最终数据的输出。
+以上为Flink的运行模型（和Spark基本一致）486074-20190710082602165-1980494462.png，Flink的程序主要由三部分构成，分别为Source、Transformation、Sink。DataSource主要负责数据的读取，Transformation主要负责对属于的转换操作，Sink负责最终数据的输出。
 
 ### DataSet API
 
