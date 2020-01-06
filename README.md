@@ -8,7 +8,7 @@
 
 ![img](/src/main/resources/pic/16acf2d994f3cb2e.png)
 
-以上为Flink的运行模型（和Spark基本一致）486074-20190710082602165-1980494462.png，Flink的程序主要由三部分构成，分别为Source、Transformation、Sink。DataSource主要负责数据的读取，Transformation主要负责对属于的转换操作，Sink负责最终数据的输出。
+以上为Flink的运行模型（和Spark基本一致），Flink的程序主要由三部分构成，分别为Source、Transformation、Sink。DataSource主要负责数据的读取，Transformation主要负责对属于的转换操作，Sink负责最终数据的输出。
 
 ### DataSet API
 
@@ -113,19 +113,19 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### DataStream Kafka Source
 
-
+快马加鞭中……...
 
 ### 自定义反列化器
 
-
+快马加鞭中……...
 
 ### Event Time与WaterMark
 
-
+快马加鞭中……...
 
 ### 触发器Trigger
 
-
+快马加鞭中……...
 
 ### 侧输出
 
@@ -134,34 +134,36 @@ Flink中分布式缓存开发步骤大致如下：
 
 ### 异步IO
 
-
+快马加鞭中……...
 
 ### 不同数据流join
 
-
+快马加鞭中……...
 
 ### DataStream Sink
 
-
+快马加鞭中……...
 
 ## 3、高级应用
 
 ### ProcessFunction
 
-
+快马加鞭中……...
 
 ### 状态管理
 
-
+快马加鞭中……...
 
 ## 4、项目案例
 
 ### 项目背景
 
-
+快马加鞭中……...
 
 ### 架构
 
-
+![img](/src/main/resources/pic/WX20190614-123737@2x.png)
 
 ### 代码实现
+
+快马加鞭中……...
