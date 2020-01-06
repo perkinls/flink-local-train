@@ -18,12 +18,12 @@ DataSet API， 对静态数据进行批处理操作，将静态数据抽象成�
 
 Flink中每一个的DataSet程序大致包含以下流程：
 
-- ```
-  - step 1 : 获得一个执行环境（ExecutionEnvironment）
-  - step 2 : 加载/创建初始数据 （Source）
-  - step 3 : 指定转换算子操作数据（Transformation）
-  - step 4 : 指定存放结果位置（Sink）
-  ```
+```
+- step 1 : 获得一个执行环境（ExecutionEnvironment）
+- step 2 : 加载/创建初始数据 （Source）
+- step 3 : 指定转换算子操作数据（Transformation）
+- step 4 : 指定存放结果位置（Sink）
+```
 
 代码案例：[Java](/src/main/java/com/lp/java/demo/dataset)  [Scala](/src/main/scala/com/lp/scala/demo/dataset)
 
@@ -33,13 +33,13 @@ DataStream API，是Flink API中最核心的数据结构，对数据流进行流
 
 Flink中每一个DataStream程序大致包含以下流程：
 
-- ```
-  - step 1 : 获得一个执行环境（StreamExecutionEnvironment）
-  - step 2 : 加载/创建初始数据 （Source）
-  - step 3 : 指定转换算子操作数据（Transformation）
-  - step 4 : 指定存放结果位置（Sink）
-  - step 5 : 手动触发执行
-  ```
+```
+- step 1 : 获得一个执行环境（StreamExecutionEnvironment）
+- step 2 : 加载/创建初始数据 （Source）
+- step 3 : 指定转换算子操作数据（Transformation）
+- step 4 : 指定存放结果位置（Sink）
+- step 5 : 手动触发执行
+```
 
 > 注意：
 >
@@ -56,11 +56,13 @@ Apache Flink 具有两个关系型API：Table API 和SQL。
 Table & SQL API 还有另一个职责，就是流处理和批处理统一的 API 层。Flink 在 runtime 层是统一的，因为 Flink 将批任务看做流的一种特例来执行，这也是 Flink 向外鼓吹的一点。然而在编程模型上，Flink 却为批和流提供了两套 API （DataSet 和 DataStream）。为什么 runtime 统一，而编程模型不统一呢？ 在我看来，这是本末倒置的事情。用户才不管你 runtime 层是否统一，用户更关心的是写一套代码。所以 Table & SQL API 就扛起了统一API的大旗，批上的查询会随着输入数据的结束而结束并生成有限结果集，流上的查询会一直运行并生成结果流。Table & SQL API 做到了批与流上的查询具有同样的语法，因此不用改代码就能同时在批和流上跑。
 Flink中每一个Table & Sql程序大致包含以下流程：
 
+```
 - step 1 : 获得一个执行环境（ExecutionEnvironment/StreamExecutionEnvironment）
 - step 2 : 根据执行环境获取Table & Sql运行环境（TableEnvironment）
 - step 3 : 注册输入表（Input table）
 - step 4 : 执行Table & Sql查询
 - step 5 : 输出表（Output table）结果发送到外部系统
+```
 
 代码案例：[Java](/src/main/java/com/lp/java/demo/datastream)  [Scala](/src/main/scala/com/lp/scala/demo/datastream)
 
