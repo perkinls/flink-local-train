@@ -1,10 +1,10 @@
 # Flink从入门到项目实践
 
-> Apache Flink是一个面向分布式数据流处理和批量数据处理的开源计算平台，提供支持流处理和批处理两种类型应用的功能。文章会对Flink中基本API如：DataSet、DataStream、Table、Sql和常用特性如：Time&Window、窗口函数、Watermark、触发器、分布式缓存、异步IO、侧输出、广播和高级应用如：ProcessFunction、状态管理等知识点进行整理。
->
-> 代码涵盖Java和Scala版本（因笔者时间和能力有限，代码仅供参考，如有错误的地方请多多指证）。好手不敌双拳，双拳不如四手！希望和大家一起成长、共同进步！
+Apache Flink是一个面向分布式数据流处理和批量数据处理的开源计算平台，提供支持流处理和批处理两种类型应用的功能。文章会对Flink中基本API如：DataSet、DataStream、Table、Sql和常用特性如：Time&Window、窗口函数、Watermark、触发器、分布式缓存、异步IO、侧输出、广播和高级应用如：ProcessFunction、状态管理等知识点进行整理。
 
-DataStream测试kafka的生产者为统一的类，[KafkaProducer](/src/main/scala/com/lp/scala/demo/KafkaProducer.scala)可以指定不同的方法分别发送string、json、k/v格式数据。
+代码涵盖Java和Scala版本（因笔者时间和能力有限，代码仅供参考，如有错误的地方请多多指证）。好手不敌双拳，双拳不如四手！希望和大家一起成长、共同进步！
+
+> DataStream测试kafka的生产者为统一的Mock类，[KafkaProducer](/src/main/scala/com/lp/scala/demo/KafkaProducer.scala)可以指定不同的方法分别发送string、json、k/v格式数据。
 
 ### Quick Start
 
