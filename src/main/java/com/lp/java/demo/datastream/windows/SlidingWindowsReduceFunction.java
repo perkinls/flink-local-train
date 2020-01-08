@@ -16,6 +16,13 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 
 import java.util.Properties;
 
+/**
+ * <p/> 
+ * <li>Description: 滑动窗口内聚合</li>
+ *                  以第一个元素作为基准，窗口大小为10和滑动都为10
+ * <li>@author: panli0226@sina.com</li> 
+ * <li>Date: 2020-01-07 20:36</li> 
+ */
 public class SlidingWindowsReduceFunction {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment

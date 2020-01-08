@@ -16,6 +16,16 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 
 import java.util.Properties;
 
+/**
+ * <p/> 
+ * <li>Description: 会话窗口具有动态间隙的处理时间进行</li>
+ *
+ * 在会话窗口中按活动会话分配器组中的数据元。与翻滚窗口和滑动窗口相比，会话窗口不重叠并且没有固定的开始和结束时间。
+ * 相反，当会话窗口在一段时间内没有接收到数据元时，即当发生不活动的间隙时，会关闭会话窗口。会话窗口分配器可以配置
+ * 静态会话间隙或 会话间隙提取器函数，该函数定义不活动时间段的长度。当此期限到期时，当前会话将关闭，后续数据元将分配给新的会话窗口。
+ * <li>@author: panli0226@sina.com</li> 
+ * <li>Date: 2020-01-07 21:35</li> 
+ */
 public class SessionWindowsAggregate {
     private static class AverageAggregate implements
             AggregateFunction<Tuple2<String, Long>, Tuple2<Long, Long>, Double> {

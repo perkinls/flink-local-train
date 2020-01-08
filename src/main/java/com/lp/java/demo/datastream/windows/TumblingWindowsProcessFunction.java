@@ -18,6 +18,14 @@ import org.apache.flink.util.Collector;
 
 import java.util.Properties;
 
+/**
+ * <p/> 
+ * <li>Description: 统计一个window中元素个数，此外，还将window的信息添加到输出中。</li>
+ * 使用ProcessWindowFunction来做简单的聚合操作，如:计数操作，性能是相当差的。
+ * 将ReduceFunction跟ProcessWindowFunction结合起来，来获取增量聚合和添加到ProcessWindowFunction中的信息，性能更好
+ * <li>@author: panli0226@sina.com</li> 
+ * <li>Date: 2020-01-07 22:35</li> 
+ */
 public class TumblingWindowsProcessFunction {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment

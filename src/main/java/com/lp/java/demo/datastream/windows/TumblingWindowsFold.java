@@ -17,6 +17,13 @@ import com.lp.java.demo.datastream.util.Split2KV;
 
 import java.util.Properties;
 
+/**
+ * <p/> 
+ * <li>Description: 滚动窗口的FoldFunction聚合函数</li>
+ * FoldFunction指定窗口的输入数据元如何与输出类型的数据元组合
+ * <li>@author: panli0226@sina.com</li> 
+ * <li>Date: 2020-01-07 20:34</li> 
+ */
 public class TumblingWindowsFold {
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment

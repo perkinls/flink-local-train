@@ -141,18 +141,51 @@ Flink提供了特殊的`Kafka connector`，用于从Kafka主题读写数据。 F
 
 我们知道，流处理从事件产生，到流经`source`，再到`operator`，中间是有一个过程和时间的。虽然大部分情况下，流到operator的数据都是按照事件产生的时间顺序来的，但是也不排除由于网络、背压等原因，导致乱序的产生（`out-of-order`或者说`late element`）。但是对于`late element`，我们又不能无限期的等下去，必须要有个机制来保证一个特定的时间后，必须触发window去进行计算了。这个特别的机制，就是`watermark`。
 
-有关WaterMark详解请参考文章：**[一文读懂WaterMark](http://www.lllpan.top/article/46)**
+有关WaterMark详解请参考文章：**[一文读懂WaterMark机制](http://www.lllpan.top/article/46)**
 
 代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/watermark)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/watermark)
 
-### 触发器Trigger
+### 窗口函数（Window Function）
 
+窗口函数（`Window Function`）作用于窗口分配器之后，指定要在每个窗口上执行的计算。一旦系统确定某个窗口已准备好进行处理，就可以使用该窗口函数来处理每个（按key分组）窗口的元素。
+
+窗口函数可以是`ReduceFunction`，`AggregateFunction`，`FoldFunction`或`ProcessWindowFunction`之一。前两个可以更有效地执行，因为Flink可以在每个窗口到达时逐步地聚合它们。`ProcessWindowFunction`为窗口中包含的所有元素以及该元素所属的窗口的其他元信息获取Iterable。使用`ProcessWindowFunction`进行窗口转换不能像其他情况一样有效地执行，因为Flink必须在调用函数之前会在内部缓冲窗口的所有元素。可以通过将`ProcessWindowFunction`与`ReduceFunction`，`AggregateFunction`或`FoldFunction`组合使用来获得窗口元素的增量聚合以及`ProcessWindowFunction`接收的其他窗口元数据，从而缓解这种情况。
+
+![img](/Users/lipan/app/typora-pic/20200103173407235.png)
+
+关于窗口函数更多可参考笔者博客：**[Flink中窗口函数:](http://www.lllpan.top/article/43)** http://www.lllpan.top/article/43
+
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/windows)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/windows)
+
+### 触发器（Trigger）
+
+触发器（Trigger）确定窗口何时准备好由窗口功能处理。每个WindowAssigner都带有一个默认触发器。如果默认触发器不适合您的需求，则可以使用trigger（...）指定自定义触发器。
+
+trigger触发器接口有五个方法允许trigger对不同的事件做出反应： 
+
+- onElement()进入窗口的每个元素都会调用该方法。
+- onEventTime()事件时间timer触发的时候被调用。
+- onProcessingTime()处理时间timer触发的时候会被调用。
+- onMerge()有状态的触发器相关，并在它们相应的窗口合并时合并两个触发器的状态，例如使用会话窗口。
+- clear()该方法主要是执行窗口的删除操作。
+
+```
 // TODO 等待更新中…...
+```
 
 ### 侧输出
 
 - 乱序
+
+```
+// TODO 等待更新中…...
+```
+
 - 分流
+
+```
+// TODO 等待更新中…...
+```
 
 ### 异步IO
 
@@ -172,21 +205,29 @@ Flink中`异步I/O`的开发步骤大致如下：
 
 ### 不同数据流join
 
+```
 // TODO 等待更新中…...
+```
 
 ### DataStream Sink
 
+```
 // TODO 等待更新中…...
+```
 
 ## 3、高级应用
 
 ### ProcessFunction
 
+```
 // TODO 等待更新中…...
+```
 
 ### 状态管理
 
+```
 // TODO 等待更新中…...
+```
 
 ## 4、项目案例
 
@@ -203,4 +244,7 @@ Flink中`异步I/O`的开发步骤大致如下：
 
 ### 代码实现
 
+```
 // TODO 等待更新中…...
+```
+
