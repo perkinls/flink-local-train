@@ -1,6 +1,6 @@
 package com.lp.scala.demo.datastream.sideoutputs
 
-import com.lp.scala.demo.datastream.serialization.KafkaEventSchema
+import com.lp.scala.demo.datastream.source.KafkaEventSchema
 import com.lp.scala.demo.utils.ConfigUtils
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.functions.ReduceFunction
@@ -16,7 +16,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 /**
   * <p/> 
   * <li>Description: 侧输出解决延迟数据</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-10 13:48</li> 
   */
 object LateDataSideOut {

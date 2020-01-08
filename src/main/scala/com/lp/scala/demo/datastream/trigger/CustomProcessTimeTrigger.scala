@@ -20,7 +20,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
   * 默认情况下，预先实现的trigger仅仅是FIRE，不会清除窗口的状态。
   * 注意purgeing将仅仅删除窗口的内容，并将完好保留有关窗口和任何触发状态的所有元信息。
   *
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-07 22:55</li> 
   */
 class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {

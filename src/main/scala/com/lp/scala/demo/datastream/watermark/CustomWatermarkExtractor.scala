@@ -6,8 +6,8 @@ import org.apache.flink.streaming.api.watermark.Watermark
 
 /**
   * <p/> 
-  * <li>Description: 自定义周期性时间戳分配器和watermark发射器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>Description: 自定义watermark发射器</li>
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-08 22:37</li> 
   */
 class CustomWatermarkExtractor extends AssignerWithPeriodicWatermarks[JSONObject] {

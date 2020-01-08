@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction;
 /**
  * <p/>
  * <li>Description: 自定义source并行</li>
- * <li>@author: panli@0226@sina.com</li>
+ * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2019-04-15 13:28</li>
  */
 public class JavaCustomParallelSourceFunction implements ParallelSourceFunction<Long> {

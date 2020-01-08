@@ -3,7 +3,7 @@ package com.lp.scala.demo.datastream.asyncio
 import java.util.concurrent.TimeUnit
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
-import com.lp.scala.demo.datastream.serialization.KafkaEventSchema
+import com.lp.scala.demo.datastream.source.KafkaEventSchema
 import com.lp.scala.demo.utils.ConfigUtils
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.functions.RichFlatMapFunction
@@ -25,7 +25,7 @@ import redis.clients.jedis.Jedis
   * 注意：
   * 可以通过增加MapFunction的一个较大并行度也可以改善吞吐量的，但是这意味着更高的资源开销，
   * 更多的MapFunction实例意味着更多的task，线程，Flink内部网络连接，数据库的链接，缓存，更多内部状态开销
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-15 13:42</li> 
   */
 object FlatMapJoin {

@@ -11,7 +11,7 @@ import scala.collection.mutable
   * <p/> 
   * <li>Description:
   * 自定义Mysql 并行的Source
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-28 21:15</li> 
   */
 class MySQLSource extends RichParallelSourceFunction[mutable.HashMap[String, String]] {

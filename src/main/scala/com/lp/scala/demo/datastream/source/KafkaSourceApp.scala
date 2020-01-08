@@ -16,7 +16,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 /**
   * <p/> 
   * <li>Description: kafka消费者测试,自定义触发器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-07 22:31</li> 
   */
 object KafkaSourceApp {

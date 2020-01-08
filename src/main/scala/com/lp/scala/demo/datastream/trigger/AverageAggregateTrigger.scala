@@ -5,7 +5,7 @@ import org.apache.flink.api.common.functions.AggregateFunction
 /**
   * <p/> 
   * <li>Description: 累加器窗口触发器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-10 17:58</li> 
   */
 class AverageAggregateTrigger extends AggregateFunction[(String, Long), (Long, Long), Double] {

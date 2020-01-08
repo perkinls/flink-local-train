@@ -13,7 +13,7 @@ import java.util.Random;
  *
  * <p/>
  * <li>Description: kafka生产者随机产生数据</li>
- * <li>@author: panli@0226@sina.com</li>
+ * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2019-04-28 20:21</li>
  */
 public class KafkaLogProducer {

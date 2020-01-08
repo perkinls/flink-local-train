@@ -137,7 +137,13 @@ Flink提供了特殊的`Kafka connector`，用于从Kafka主题读写数据。 F
 
 ### Event Time与WaterMark
 
-// TODO 等待更新中…...
+`Watermark`是一种衡量`Event Time`进展的机制，它是数据本身的一个隐藏属性。通常`watermark`是用于处理乱序事件的，而正确的处理乱序事件，通常用`watermark`机制结合`window`来实现。
+
+我们知道，流处理从事件产生，到流经`source`，再到`operator`，中间是有一个过程和时间的。虽然大部分情况下，流到operator的数据都是按照事件产生的时间顺序来的，但是也不排除由于网络、背压等原因，导致乱序的产生（`out-of-order`或者说`late element`）。但是对于`late element`，我们又不能无限期的等下去，必须要有个机制来保证一个特定的时间后，必须触发window去进行计算了。这个特别的机制，就是`watermark`。
+
+有关WaterMark详解请参考文章：**[一文读懂WaterMark](http://www.lllpan.top/article/46)**
+
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/watermark)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/watermark)
 
 ### 触发器Trigger
 

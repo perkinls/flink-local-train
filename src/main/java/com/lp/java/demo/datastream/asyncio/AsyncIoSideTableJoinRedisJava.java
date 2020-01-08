@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p/>
  * <li>Description: 异步IO将数据写入redis缓存中 JAVA版本(仅供参考)</li>
- * <li>@author: panli@0226@sina.com</li>
+ * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2019-05-15 13:42</li>
  * https://zhuanlan.zhihu.com/p/48686938
  */

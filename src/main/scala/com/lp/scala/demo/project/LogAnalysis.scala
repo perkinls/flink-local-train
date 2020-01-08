@@ -34,7 +34,7 @@ import scala.collection.mutable.ArrayBuffer
   * 功能：
   *   最近一分钟每个域名产生的流量统计
   *
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-28 20:45</li> 
   */
 object LogAnalysis {

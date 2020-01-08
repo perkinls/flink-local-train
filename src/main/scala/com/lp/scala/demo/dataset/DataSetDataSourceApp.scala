@@ -8,7 +8,7 @@ import org.apache.flink.util.Collector
 /**
   * <p/> 
   * <li>Description: TODO</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-12 13:08</li> 
   */
 object DataSetDataSourceApp {

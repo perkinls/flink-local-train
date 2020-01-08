@@ -15,7 +15,7 @@ import org.apache.flink.util.{Collector, OutputTag}
   * flink提供了侧输出这个功能，侧输出的输出类型可以与主流不同，可以有多个侧输出(sideoutput)，每个侧输出不同的类型。
   *     1. 定义OutputTag
   *     2. 使用特定的函数ProcessFunction、CoProcessFunction、ProcessWindowFunction、ProcessAllWindowFunction
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-10 13:28</li> 
   */
 object SideOutPutTest {

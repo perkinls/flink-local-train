@@ -20,7 +20,7 @@ import org.apache.flink.util.Collector
   * https://blog.csdn.net/xxscj/article/details/85622418
   * "区间关联当前仅支持EventTime"
   * Interval JOIN 相对于UnBounded的双流JOIN来说是Bounded JOIN。就是每条流的每一条数据会与另一条流上的不同时间区域的数据进行JOIN。
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-08 21:02</li> 
   */
 object IntervalJoin {

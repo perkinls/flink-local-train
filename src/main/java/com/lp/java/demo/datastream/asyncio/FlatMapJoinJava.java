@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p/>
  * <li>Description: mapFunction算子同步访问外部存储</li>
- * <li>@author: panli@0226@sina.com</li>
+ * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2019-06-14 22:22</li>
  * Caffeine可参考 https://www.cnblogs.com/liujinhua306/p/9808500.html
  *

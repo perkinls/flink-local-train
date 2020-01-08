@@ -13,7 +13,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
   * <p/> 
   * <li>Description: 滑动窗口内聚合</li>
   *                  以第一个元素作为基准，窗口大小为10和滑动都为10
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-10 16:36</li> 
   */
 object SlidingWindowsReduceFunction {

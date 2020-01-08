@@ -21,7 +21,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
   *
   * 注意：
   * join必须依赖窗口及watermark操作
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-08 19:52</li> 
   */
 object TumblingWindowJoin {

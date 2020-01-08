@@ -2,7 +2,7 @@ package com.lp.java.demo.datastream.asyncio;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.lp.scala.demo.datastream.serialization.KafkaEventSchema;
+import com.lp.scala.demo.datastream.source.KafkaEventSchema;
 import com.lp.scala.demo.utils.ConfigUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p/>
  * <li>Description: 异步IO写入mysql数据库 JAVA版本(仅供参考)</li>
- * <li>@author: panli@0226@sina.com</li>
+ * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2019-06-13 23:28</li>
  * 异步IO三步曲：
  * 1.AsyncFunction的一个实现，用来分派请求

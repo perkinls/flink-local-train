@@ -22,7 +22,7 @@ import scala.collection.mutable
   *   域名和用户有对应关系
   *   Flink接受Kafka数据处理+Flink读取域名和用户的配置数据
   *
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-29 20:10</li> 
   */
 object LogAnalysis02 {

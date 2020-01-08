@@ -1,7 +1,9 @@
 package com.lp.java.demo.datastream.watermark;
 
+import com.lp.scala.demo.utils.ConfigUtils;
 import net.sf.json.JSONObject;
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -9,54 +11,77 @@ import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
+import scala.Tuple2;
 
 import javax.annotation.Nullable;
 import java.util.Properties;
 
-/*
-	watermark测试：
-	// 开启checkpoint
-	// 设置自动重启
-
-	原理可以参考：
-	https://zhuanlan.zhihu.com/p/55221833
-	https://zhuanlan.zhihu.com/p/59376243
+/**
+ * <p/>
+ * <li>title: WaterMark</li>
+ * <li>@author: li.pan</li>
+ * <li>Date: 2020/01/07 22:01 下午</li>
+ * <li>Version: V1.0</li>
+ * <li>Description: WaterMark测试</li>
  */
-public class kafkaSourceWatermarkTest {
+public class KafkaSourceWaterMark {
 
 	public static void main(String[] args) throws Exception {
 		// set up the streaming execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+		// 设置最少一次处理语义和恰一次处理语义
+//		env.enableCheckpointing(20000,CheckpointingMode.EXACTLY_ONCE);
+//		checkpoint 也可以分开设置
+//		env.enableCheckpointing(20000);
+//		env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
+//		设置checkpoint目录
+//		env.setStateBackend(new FsStateBackend("/hdfs/checkpoint"));
+//
+//        // checkpoint的清楚策略
+//        env.getCheckpointConfig()
+//                .enableExternalizedCheckpoints(CheckpointConfig.
+//                        ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
+
+		/**
+		 * 设置重启策略/5次尝试/每次尝试间隔50s
+		 */
+		env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, 50000));
+		// 设置生成WaterMark时间
 		env.getConfig().setAutoWatermarkInterval(1000); //1s
 
 		// 设置事件时间
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-		Properties properties = new Properties();
-		properties.setProperty("bootstrap.servers", "mt-mdh.local:9093");
-		properties.setProperty("group.id", "jsontest");
+		Tuple2<String, Properties> kafkaConfig = ConfigUtils.apply("json");
+		/**
+		 * 构建Kafka消费者
+		 * 反序列化/从最新位置开始消费/指定WaterMark
+		 */
+		FlinkKafkaConsumerBase kafkaConsumer =
+				new FlinkKafkaConsumer(kafkaConfig._1, new KafkaEventSchema(), kafkaConfig._2)
+						.setStartFromLatest()
+						.assignTimestampsAndWatermarks(new CustomWatermarkExtractor());
 
-		FlinkKafkaConsumer010<JSONObject> kafkaConsumer010 = new FlinkKafkaConsumer010<>("jsontest",
-				new KafkaEventSchema(), //自定义反序列化
-				properties);
-		kafkaConsumer010.setStartFromLatest(); //从最新的offset开始消费消息
-		kafkaConsumer010. // 设置自定义时间戳分配器和watermark发射器，也可以在后面的算子中设置
-				assignTimestampsAndWatermarks(new CustomWatermarkExtractor());
 
+		/**
+		 * 添加数据源 / 滚动窗口，大小为10s / 允许10s延迟 / 终端输出
+		 */
 		env
-		.addSource(kafkaConsumer010) // 添加数据源
-//		.assignTimestampsAndWatermarks(new CustomWatermarkExtractor());	//设置自定义时间戳分配器和watermark发射器
-		.keyBy(new KeySelector<JSONObject, String>() { // 注意 keyselector的使用
+		.addSource(kafkaConsumer)
+//		.assignTimestampsAndWatermarks(new CustomWatermarkExtractor());
+		.keyBy(new KeySelector<JSONObject, String>() {
 			@Override
 			public String getKey(JSONObject value) throws Exception {
 				return value.getString("fruit");
 			}
 		})
-		.window(TumblingEventTimeWindows.of(Time.seconds(10))) // 滚动窗口，大小为10s
-		.allowedLateness(Time.seconds(10)) // 允许10s延迟
+		.window(TumblingEventTimeWindows.of(Time.seconds(10)))
+		.allowedLateness(Time.seconds(10))
 		.reduce(new ReduceFunction<JSONObject>() {
+			@Override
 			public JSONObject reduce(JSONObject v1, JSONObject v2) {
 				String fruit = v1.getString("fruit");
 				int number = v1.getInt("number");
@@ -70,7 +95,7 @@ public class kafkaSourceWatermarkTest {
 		})
 		.print();
 
-		env.execute(kafkaSourceWatermarkTest.class.getCanonicalName());
+		env.execute(KafkaSourceWaterMark.class.getCanonicalName());
 	}
 
 	private static class CustomWatermarkExtractor implements AssignerWithPeriodicWatermarks<JSONObject> {

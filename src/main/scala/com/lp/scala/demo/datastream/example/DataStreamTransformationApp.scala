@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.scala.{SplitStream, StreamExecutionEnviron
 /**
   * <p/> 
   * <li>Description: DataStream转换算子</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-15 20:34</li> 
   */
 object DataStreamTransformationApp {

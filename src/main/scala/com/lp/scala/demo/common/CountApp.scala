@@ -9,7 +9,7 @@ import org.apache.flink.core.fs.FileSystem.WriteMode
 /**
   * <p/> 
   * <li>Description: flink 计数器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-14 21:53</li> 
   * Scala实现通过一个add操作累加最终的结果，在job执行后可以获取最终结果
   */

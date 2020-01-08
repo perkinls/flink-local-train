@@ -1,6 +1,6 @@
 package com.lp.scala.demo.datastream.watermark
 
-import com.lp.scala.demo.datastream.serialization.KafkaEventSchema
+import com.lp.scala.demo.datastream.source.KafkaEventSchema
 import com.lp.scala.demo.utils.ConfigUtils
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.functions.ReduceFunction
@@ -13,10 +13,10 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 /**
   * <p/> 
   * <li>Description: 设置自定义时间戳分配器和watermark发射器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-08 22:09</li> 
   */
-object KafkaSourceWatermarkTest {
+object KafkaSourceWatermark {
   def main(args: Array[String]): Unit = {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -31,8 +31,9 @@ object KafkaSourceWatermarkTest {
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1, new
         KafkaEventSchema, kafkaConfig._2)
-      .setStartFromEarliest()
+      .setStartFromLatest()
       .assignTimestampsAndWatermarks(new CustomWatermarkExtractor) //设置自定义时间戳分配器和watermark发射器，也可以在后面的算子中设置
+
     env
       .addSource(kafkaConsumer)
       //      .assignTimestampsAndWatermarks(CustomWatermarkExtractor)//设置自定义时间戳分配器和watermark发射器

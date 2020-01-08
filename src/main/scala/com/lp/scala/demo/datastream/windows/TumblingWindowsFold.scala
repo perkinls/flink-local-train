@@ -15,7 +15,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
   * <p/> 
   * <li>Description: 滚动窗口的FoldFunction聚合函数</li>
   * FoldFunction指定窗口的输入数据元如何与输出类型的数据元组合
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-10 16:34</li> 
   */
 object TumblingWindowsFold {

@@ -10,7 +10,7 @@ import scala.util.Random
 /**
   *
   * <li>Description: kafka生产者</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-07 21:54</li> 
   */
 object KafkaProducer {
@@ -33,10 +33,10 @@ object KafkaProducer {
 
     //指定发送任意格式的数据到kafka
     while (true) {
-      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(100))))
-//      sendMsgJson(producer)
+      //      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(100))))
+      sendMsgJson(producer)
       //      sendMsgKv(producer)
-      //      sendMsgEvent(producer)
+      //            sendMsgEvent(producer)
       try {
         Thread.sleep(2000)
       } catch {
@@ -62,7 +62,7 @@ object KafkaProducer {
       json.put("time", System.currentTimeMillis)
       producer.send(new ProducerRecord[String, String]("fk_json_topic", String.valueOf(i), json.toString))
 
-      println("发送到kafak数据格式"+String.valueOf(i)+"："+ json.toString)
+      println("发送到kafak数据格式" + String.valueOf(i) + "：" + json.toString)
 
       try {
         Thread.sleep(1000)

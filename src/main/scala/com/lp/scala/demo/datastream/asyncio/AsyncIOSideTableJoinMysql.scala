@@ -24,7 +24,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 /**
   * <p/> 
   * <li>Description: 异步IO写入mysql数据库</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-15 13:42</li> 
   * 异步IO三步曲：
   *     1.AsyncFunction的一个实现，用来分派请求

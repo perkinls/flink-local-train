@@ -9,9 +9,11 @@ import java.io.IOException;
 
 /**
  * <p/>
- * <li>Description: 自定义Json反序列化器</li>
- * <li>@author: panli@0226@sina.com</li>
- * <li>Date: 2019-05-08 22:06</li>
+ * <li>title: 自定义Json反序列化器</li>
+ * <li>@author: li.pan</li>
+ * <li>Date: 2020/01/07 22:07 下午</li>
+ * <li>Version: V1.0</li>
+ * <li>Description: 自定义元素个数触发器</li>
  */
 public class KafkaEventSchema implements DeserializationSchema<JSONObject>, SerializationSchema<JSONObject> {
 

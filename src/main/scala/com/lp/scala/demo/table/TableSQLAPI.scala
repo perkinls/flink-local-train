@@ -7,7 +7,7 @@ import org.apache.flink.types.Row
 /**
   * <p/> 
   * <li>Description: </li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-16 12:50</li> 
   */
 object TableSQLAPI {

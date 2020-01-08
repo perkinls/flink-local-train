@@ -6,7 +6,7 @@ import org.apache.flink.table.api.scala.StreamTableEnvironment
 /**
   * <p/> 
   * <li>Description: TODO</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-16 12:50</li> 
   */
 object TableSqlApiApp {

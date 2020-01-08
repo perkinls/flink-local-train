@@ -11,7 +11,7 @@ import net.ceedubs.ficus.Ficus._
   * <li>Description: 读取kafka配置文件
   * 可用于切换不同环境切换
   * </li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-21 14:30</li> 
   */
 object ConfigUtils {

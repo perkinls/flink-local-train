@@ -1,4 +1,4 @@
-package com.lp.scala.demo.datastream.serialization
+package com.lp.scala.demo.datastream.source
 
 import net.sf.json.JSONObject
 import org.apache.flink.api.common.serialization.{DeserializationSchema, SerializationSchema}
@@ -7,7 +7,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 /**
   * <p/> 
   * <li>Description: 自定义Json反序列化器</li>
-  * <li>@author: panli@0226@sina.com</li> 
+  * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-05-08 22:06</li> 
   */
 class KafkaEventSchema extends DeserializationSchema[JSONObject] with SerializationSchema[JSONObject]{

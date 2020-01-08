@@ -14,7 +14,7 @@
 ///**
 //  * <p/> 
 //  * <li>Description: 带状态计算测试</li>
-//  * <li>@author: panli@0226@sina.com</li> 
+//  * <li>@author: panli0226@sina.com</li> 
 //  * <li>Date: 2019-05-09 22:06</li> 
 //  */
 //object KeyedStatesTest {
