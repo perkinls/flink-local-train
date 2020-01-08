@@ -151,7 +151,7 @@ Flink提供了特殊的`Kafka connector`，用于从Kafka主题读写数据。 F
 
 窗口函数可以是`ReduceFunction`，`AggregateFunction`，`FoldFunction`或`ProcessWindowFunction`之一。前两个可以更有效地执行，因为Flink可以在每个窗口到达时逐步地聚合它们。`ProcessWindowFunction`为窗口中包含的所有元素以及该元素所属的窗口的其他元信息获取Iterable。使用`ProcessWindowFunction`进行窗口转换不能像其他情况一样有效地执行，因为Flink必须在调用函数之前会在内部缓冲窗口的所有元素。可以通过将`ProcessWindowFunction`与`ReduceFunction`，`AggregateFunction`或`FoldFunction`组合使用来获得窗口元素的增量聚合以及`ProcessWindowFunction`接收的其他窗口元数据，从而缓解这种情况。
 
-![img](/Users/lipan/app/typora-pic/20200103173407235.png)
+![img](/src/main/resources/pic/20200103173407235.png)
 
 关于窗口函数更多可参考笔者博客：**[Flink中窗口函数:](http://www.lllpan.top/article/43)** http://www.lllpan.top/article/43
 
