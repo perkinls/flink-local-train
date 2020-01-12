@@ -1,6 +1,7 @@
 package com.lp.java.demo.datastream.windows;
 
 import com.lp.java.demo.datastream.util.Split2KV;
+import com.lp.scala.demo.utils.ConfigUtils;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -12,16 +13,18 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 
 import java.util.Properties;
 
 /**
- * <p/> 
+ * <p/>
  * <li>Description: 滑动窗口内聚合</li>
- *                  以第一个元素作为基准，窗口大小为10和滑动都为10
- * <li>@author: panli0226@sina.com</li> 
- * <li>Date: 2020-01-07 20:36</li> 
+ * 以第一个元素作为基准，窗口大小为10和滑动都为10
+ * <li>@author: panli0226@sina.com</li>
+ * <li>Date: 2020-01-07 20:36</li>
  */
 public class SlidingWindowsReduceFunction {
     public static void main(String[] args) throws Exception {
@@ -29,36 +32,31 @@ public class SlidingWindowsReduceFunction {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 设置最少一次处理语义和恰一次处理语义
-        env.enableCheckpointing(20000,CheckpointingMode.EXACTLY_ONCE);
+//       env.enableCheckpointing(20000,CheckpointingMode.EXACTLY_ONCE);
 //		checkpoint 也可以分开设置
-        env.enableCheckpointing(20000);
+//      env.enableCheckpointing(20000);
 //		env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
 
 //		设置checkpoint目录
 //		env.setStateBackend(new FsStateBackend("/hdfs/checkpoint"));
-        env.getCheckpointConfig() // checkpoint的清楚策略
-                .enableExternalizedCheckpoints(CheckpointConfig.
-                        ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
-//		设置重启策略
-        env.setRestartStrategy(RestartStrategies.
-                fixedDelayRestart(5,//5次尝试
-                        50000)); //每次尝试间隔50s
+        /**
+         * 设置重启策略/5次尝试/每次尝试间隔50s
+         */
+        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, 50000));
 
-        // 选择设置事件事件和处理事件
+
+        // 选择设置时间
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
-        Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "mt-mdh.local:9093");
-        properties.setProperty("group.id", "SlidingWindowsReduceFunction");
 
-        FlinkKafkaConsumer010<String> kafkaConsumer010 = new FlinkKafkaConsumer010<>("KV",
-                new SimpleStringSchema(),
-                properties);
+        scala.Tuple2<String, Properties> kafkaConfig = ConfigUtils.apply("kv");
+        FlinkKafkaConsumerBase kafkaConsumer =
+                new FlinkKafkaConsumer(kafkaConfig._1, new SimpleStringSchema(), kafkaConfig._2)
+                        .setStartFromLatest();
 
-        kafkaConsumer010.setStartFromLatest();
 
         SingleOutputStreamOperator<Tuple2<String, Long>> reduce = env
-                .addSource(kafkaConsumer010)
+                .addSource(kafkaConsumer)
                 .map(new Split2KV())
 //                .windowAll(SlidingEventTimeWindows.of(Time.seconds(10),Time.seconds(10)))
                 .windowAll(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(10)))

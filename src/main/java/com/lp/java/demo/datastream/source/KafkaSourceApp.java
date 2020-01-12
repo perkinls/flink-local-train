@@ -1,5 +1,6 @@
 package com.lp.java.demo.datastream.source;
 
+import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
 import com.lp.scala.demo.utils.ConfigUtils;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -8,13 +9,10 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.jobgraph.JobVertex;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
-import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
-import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 import scala.Tuple2;
 

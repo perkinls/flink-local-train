@@ -34,14 +34,9 @@ object KafkaProducer {
     //指定发送任意格式的数据到kafka
     while (true) {
       //      producer.send(new ProducerRecord[String, String]("fk_string_topic", String.valueOf(random.nextInt(100))))
-      sendMsgJson(producer)
-      //      sendMsgKv(producer)
+      //      sendMsgJson(producer)
+      sendMsgKv(producer)
       //            sendMsgEvent(producer)
-      try {
-        Thread.sleep(2000)
-      } catch {
-        case e: InterruptedException => e.printStackTrace()
-      }
     }
 
   }
@@ -79,28 +74,28 @@ object KafkaProducer {
     * @param producer
     */
   def sendMsgKv(producer: Producer[String, String]): Unit = {
-    val points: Random = new Random(2)
+    val points: Random = new Random()
     val arrayBuffer = Array[String]("apple", "pear", "nut", "grape", "banana", "pineapple", "pomelo", "orange")
 
     for (i <- 0 until 10) {
 
       //join情况
-      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5) + " " + System.currentTimeMillis
-      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
-      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i) + "01", str))
-      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
-      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i) + "02", str))
+      // val str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5) + " " + System.currentTimeMillis
+      // producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
+      //      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i) + "01", str))
+      //      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
+      //      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i) + "02", str))
 
-      println("first  Kv:" + String.valueOf(i) + "-1" + ":======>" + str + "\t" + str)
-      println("Second Kv:" + String.valueOf(i) + "-2" + ":======>" + str + "\t" + str)
+      //println("first  Kv:" + String.valueOf(i) + "-1" + ":======>" + str + "\t" + str)
+      //      println("Second Kv:" + String.valueOf(i) + "-2" + ":======>" + str + "\t" + str)
 
       //非join情况
-      //      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
-      //      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
-      //      println("first Kv:" + String.valueOf(i) + ":======>" + str)
-      //      str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
-      //      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
-      //      println("Second Kv_1:" + String.valueOf(i) + ":======>" + str)
+      var str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
+      producer.send(new ProducerRecord[String, String]("fk_kv_topic", String.valueOf(i), str))
+      println("first Kv:" + String.valueOf(i) + ":======>" + str)
+      str = arrayBuffer(points.nextInt(8)) + " " + points.nextInt(5)
+      producer.send(new ProducerRecord[String, String]("fk_kv_1_topic", String.valueOf(i), str))
+      println("Second Kv_1:" + String.valueOf(i) + ":======>" + str)
 
       try {
         Thread.sleep(1000)

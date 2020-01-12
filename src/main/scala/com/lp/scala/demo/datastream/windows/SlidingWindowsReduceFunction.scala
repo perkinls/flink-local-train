@@ -24,7 +24,7 @@ object SlidingWindowsReduceFunction {
     env.getConfig.setAutoWatermarkInterval(1000) //watermark间隔时间
 
     //设置事件事件
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
     val kafkaConfig = ConfigUtils.apply("kv")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
@@ -37,7 +37,6 @@ object SlidingWindowsReduceFunction {
       .map(new RichMapFunction[String, (String, Long)] {
         override def map(value: String): (String, Long) = {
           val splits = value.split(" ")
-          println((splits(0), splits(1).toLong))
           (splits(0), splits(1).toLong)
         }
       })

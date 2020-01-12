@@ -15,21 +15,24 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 public class CustomProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
     private static final long serialVersionUID = 1L;
 
-    private CustomProcessingTimeTrigger() {}
+    private CustomProcessingTimeTrigger() {
+    }
 
     private static int flag = 0;
+
     @Override
     public TriggerResult onElement(Object element, long timestamp, TimeWindow window, TriggerContext ctx) {
         ctx.registerProcessingTimeTimer(window.maxTimestamp());
         // CONTINUE是代表不做输出，也即是，此时我们想要实现比如100条输出一次，
         // 而不是窗口结束再输出就可以在这里实现。
-        if(flag > 9){
+        if (flag > 9) {
+            System.out.println("触发计算-> flag: " + flag);
             flag = 0;
             return TriggerResult.FIRE;
-        }else{
+        } else {
             flag++;
         }
-        System.out.println("onElement : "+element);
+        System.out.println("onElement : " + element);
         return TriggerResult.CONTINUE;
     }
 

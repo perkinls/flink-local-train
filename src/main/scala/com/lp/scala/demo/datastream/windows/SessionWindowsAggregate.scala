@@ -1,11 +1,13 @@
 package com.lp.scala.demo.datastream.windows
 
+import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger
 import com.lp.scala.demo.utils.ConfigUtils
 import org.apache.flink.api.common.functions.{AggregateFunction, RichMapFunction}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.assigners.{ProcessingTimeSessionWindows, SessionWindowTimeGapExtractor}
+import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.{Trigger, TriggerResult}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
@@ -27,10 +29,10 @@ object SessionWindowsAggregate {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 
-    env.getConfig.setAutoWatermarkInterval(1000) //watermark间隔时间
+    // env.getConfig.setAutoWatermarkInterval(1000) //watermark间隔时间
 
     //设置事件事件
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
     val kafkaConfig = ConfigUtils.apply("kv")
 
@@ -48,20 +50,22 @@ object SessionWindowsAggregate {
           (splits(0), splits(1).toLong)
         }
       })
-      //      .keyBy(0)
       //.windowAll(ProcessingTimeSessionWindows.withGap(Time.seconds(10)))
       //.windowAll(EventTimeSessionWindows.withGap(Time.seconds(10)))
       .windowAll(ProcessingTimeSessionWindows.withDynamicGap(new SessionWindowTimeGapExtractor[(String, Long)] {
-      override def extract(element: (String, Long)): Long = {
-        // 当发生不活动的间隙时间间隔长度2s
-        2000
-      }
-    }))
+        override def extract(element: (String, Long)): Long = {
+          // 当发生不活动的间隙时间间隔长度10s
+          10000
+        }
+      }))
       .trigger(new CustomProcessTimeTrigger)
       .aggregate(new AverageAggregate)
 
 
-    aggregate.print()
+    // 当前会话窗口结束才会输出值
+    aggregate
+      .print()
+      .setParallelism(1)
 
     env.execute("SessionWindowsAggregate")
 
@@ -79,7 +83,6 @@ object SessionWindowsAggregate {
       * @return
       */
     override def createAccumulator() = {
-//      println("触发: createAccumulator \t")
       (0L, 0L)
     }
 
@@ -91,7 +94,7 @@ object SessionWindowsAggregate {
       * @return
       */
     override def add(value: (String, Long), accumulator: (Long, Long)) = {
-//      println("触发: add  \t"+(accumulator._1 + value._2, accumulator._2 + 1L))
+      //      println("触发: add  \t"+(accumulator._1 + value._2, accumulator._2 + 1L))
       (accumulator._1 + value._2, accumulator._2 + 1L)
     }
 
@@ -102,7 +105,7 @@ object SessionWindowsAggregate {
       * @return
       */
     override def getResult(accumulator: (Long, Long)) = {
-      println("触发: getResult 累加计算结果 \t"+accumulator._1)
+      println("触发: getResult 累加计算结果 \t" + accumulator._1 + "---->" + accumulator._2)
       accumulator._1
     }
 
@@ -114,7 +117,7 @@ object SessionWindowsAggregate {
       * @return
       */
     override def merge(a: (Long, Long), b: (Long, Long)) = {
-      println("触发: merge  \t")
+      //      println("触发: merge  \t")
       (a._1 + b._1, a._2 + b._2)
     }
   }
@@ -129,7 +132,7 @@ object SessionWindowsAggregate {
     * PURGE：清除窗口中的数据元和
     * FIRE_AND_PURGE：触发​​计算并清除窗口中的数据元。
     */
-  class CustomProcessTimeTrigger extends Trigger[(String, Long), TimeWindow] {
+  class CustomProcessTimeTrigger extends Trigger[(String, Long), TimeWindow]{
 
     var flag = 0
 
@@ -148,15 +151,16 @@ object SessionWindowsAggregate {
       ctx.registerProcessingTimeTimer(window.maxTimestamp)
       // CONTINUE是代表不做输出，也就是，此时我们想要实现比如10条输出一次，
       // 而不是窗口结束再输出就可以在这里实现。
-      if (flag > 5) {
-        System.out.println("onElement : " + flag + "触发计算，保留Window内容")
+      if (flag > 9) {
+        println("触发计算-> flag: " + flag)
         flag = 0
         TriggerResult.FIRE
       }
-      else
+      else {
         flag += 1
-      System.out.println("onElement : " + flag + element)
-      TriggerResult.CONTINUE
+        println("onElement : " + element);
+        TriggerResult.CONTINUE
+      }
     }
 
     /**
@@ -180,14 +184,17 @@ object SessionWindowsAggregate {
       * @param ctx
       * @return
       */
-    override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE
+    override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =
+      TriggerResult.FIRE_AND_PURGE
 
     /**
       * 清除触发器可能仍为给定窗口保留的任何状态。
+      *
       * @param window
       * @param ctx
       */
-    override def clear(window: TimeWindow, ctx: Trigger.TriggerContext) = ctx.deleteProcessingTimeTimer(window.maxTimestamp)
+    override def clear(window: TimeWindow, ctx: Trigger.TriggerContext) =
+      ctx.deleteProcessingTimeTimer(window.maxTimestamp)
 
     /**
       * 如果此触发器支持合并触发器状态，则返回true
@@ -212,7 +219,6 @@ object SessionWindowsAggregate {
     }
 
     override def toString: String = "ProcessingTimeTrigger()"
-
 
   }
 

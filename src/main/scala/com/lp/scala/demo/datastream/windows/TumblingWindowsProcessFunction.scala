@@ -28,11 +28,13 @@ object TumblingWindowsProcessFunction {
 
     //设置事件事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
+    env.setParallelism(1)
     val kafkaConfig = ConfigUtils.apply("kv")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new SimpleStringSchema(),
-      kafkaConfig._2).setStartFromLatest()
+      kafkaConfig._2)
+      .setStartFromLatest()
 
     import org.apache.flink.api.scala._
     val process = env
@@ -106,10 +108,11 @@ object TumblingWindowsProcessFunction {
         flag = 0
         TriggerResult.FIRE
       }
-      else
-        flag += 1
-      System.out.println("onElement : " + element)
-      TriggerResult.CONTINUE
+      else {
+      flag += 1
+        System.out.println("onElement : " + element)
+        TriggerResult.CONTINUE
+      }
     }
 
     /**
@@ -157,7 +160,6 @@ object TumblingWindowsProcessFunction {
     }
 
     override def toString: String = "ProcessingTimeTrigger()"
-
 
   }
 
