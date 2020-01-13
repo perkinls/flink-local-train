@@ -47,9 +47,11 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
       flag = 0
       TriggerResult.FIRE
     }
-    else flag += 1
-    System.out.println("onElement : " + element)
-    TriggerResult.CONTINUE
+    else {
+      flag += 1
+      System.out.println("onElement : " + element)
+      TriggerResult.CONTINUE
+    }
   }
 
   /**

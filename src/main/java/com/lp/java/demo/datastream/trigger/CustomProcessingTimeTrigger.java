@@ -31,9 +31,9 @@ public class CustomProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
             return TriggerResult.FIRE;
         } else {
             flag++;
+            System.out.println("onElement : " + element);
+            return TriggerResult.CONTINUE;
         }
-        System.out.println("onElement : " + element);
-        return TriggerResult.CONTINUE;
     }
 
     @Override

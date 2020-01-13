@@ -5,14 +5,14 @@ import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.ProcessFunction
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala.{OutputTag, StreamExecutionEnvironment}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
-import org.apache.flink.util.{Collector, OutputTag}
+import org.apache.flink.util.Collector
 
 /**
   * <p/> 
   * <li>Description: 侧输出分流</li>
-  * flink提供了侧输出这个功能，侧输出的输出类型可以与主流不同，可以有多个侧输出(sideoutput)，每个侧输出不同的类型。
+  * flink提供了侧输出这个功能，侧输出的输出类型可以与主流不同，可以有多个侧输出(sideOutput)，每个侧输出不同的类型。
   *     1. 定义OutputTag
   *     2. 使用特定的函数ProcessFunction、CoProcessFunction、ProcessWindowFunction、ProcessAllWindowFunction
   * <li>@author: panli0226@sina.com</li> 
@@ -20,7 +20,6 @@ import org.apache.flink.util.{Collector, OutputTag}
   */
 object SideOutPutTest {
 
-  val outputTag = new OutputTag[String]("side_output>5")
 
   def main(args: Array[String]): Unit = {
 
@@ -28,14 +27,17 @@ object SideOutPutTest {
 
     //选择设置事件时间和处理事件
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
-    val kafkaConfig = ConfigUtils.apply("kv")
+    val kafkaConfig = ConfigUtils.apply("string")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
       new SimpleStringSchema(), //自定义反序列化器
       kafkaConfig._2)
-      .setStartFromEarliest()
+      .setStartFromLatest()
 
     import org.apache.flink.api.scala._
+
+    val outputTag = OutputTag[String]("side_output>5")
+
     val mainStream = env.addSource(kafkaConsumer)
       .map(new RichMapFunction[String, Integer] {
         override def map(value: String): Integer = {
@@ -52,7 +54,7 @@ object SideOutPutTest {
       }
     })
     mainStream.print()
-    //    mainStream.getSideOutput(outputTag).print()
+    mainStream.getSideOutput(outputTag).print()
     env.execute("SideOutPutTest")
   }
 

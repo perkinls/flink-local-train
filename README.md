@@ -169,23 +169,14 @@ trigger触发器接口有五个方法允许trigger对不同的事件做出反应
 - onMerge()有状态的触发器相关，并在它们相应的窗口合并时合并两个触发器的状态，例如使用会话窗口。
 - clear()该方法主要是执行窗口的删除操作。
 
-```
-// TODO 等待更新中…...
-```
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/trigger)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/trigger)
 
-### 侧输出
+### 侧输出（side output）
 
-- 乱序
+在Flink处理数据流时，我们经常会遇到这样的情况：在处理一个数据源时，往往需要将该源中的不同类型的数据做分割处理，如果使用` filter`算子对数据源进行筛选分割的话，势必会造成数据流的多次复制，造成不必要的性能浪费；flink中的侧输出就是**将数据流进行分割**，而不对流进行复制的一种分流机制。flink的侧输出的另一个作用就是**对延时迟到的数据进行处理**，这样就可以不必丢弃迟到的数据。
+此外，侧输出（side output）能有效的解决算子`spilt`不能进行连续分流的问题。https://issues.apache.org/jira/browse/FLINK-11084
 
-```
-// TODO 等待更新中…...
-```
-
-- 分流
-
-```
-// TODO 等待更新中…...
-```
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/sideoutputs)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/trigger)
 
 ### 异步IO
 

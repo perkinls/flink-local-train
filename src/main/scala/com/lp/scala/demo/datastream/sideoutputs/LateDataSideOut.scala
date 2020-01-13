@@ -28,7 +28,7 @@ object LateDataSideOut {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     //选择设置事件时间和处理事件
-    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val kafkaConfig = ConfigUtils.apply("json")
 
     val kafkaConsumer = new FlinkKafkaConsumer(kafkaConfig._1,
@@ -40,17 +40,17 @@ object LateDataSideOut {
     import org.apache.flink.api.scala._
     val reduce = env
       .addSource(kafkaConsumer)
-      .keyBy(_.getString("name"))
+      .keyBy(_.getString("fruit"))
       .window(TumblingEventTimeWindows.of(Time.seconds(10))) //滑动窗口，大小为10s
       .allowedLateness(Time.seconds(10)) //允许10s延迟
       .sideOutputLateData(lateOutputTag) //延迟数据侧输出
       .reduce(new ReduceFunction[JSONObject] {
       override def reduce(value1: JSONObject, value2: JSONObject): JSONObject = {
-        val name = value1.getString("name")
+        val name = value1.getString("fruit")
         val num1 = value1.getInt("number")
         val num2 = value2.getInt("number")
         val jsonStr = new JSONObject()
-        jsonStr.put("name", name)
+        jsonStr.put("fruit", name)
         jsonStr.put("number", num1 + num2)
         jsonStr
       }

@@ -1,6 +1,6 @@
 package com.lp.java.demo.datastream.spiltstream;
 
-import com.lp.java.demo.datastream.sideoutputs.SideoutputTest;
+import com.lp.java.demo.datastream.sideoutputs.SideOutputTest;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
@@ -52,7 +52,7 @@ public class SplitStreamTest {
 
         even.union(odd).print();
 
-        env.execute(SideoutputTest.class.getCanonicalName());
+        env.execute(SideOutputTest.class.getCanonicalName());
     }
     private static class String2Integer extends RichMapFunction<String, Integer> {
         private static final long serialVersionUID = 1180234853172462378L;
