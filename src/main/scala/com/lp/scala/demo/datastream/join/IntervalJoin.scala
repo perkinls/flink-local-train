@@ -79,15 +79,19 @@ object IntervalJoin {
       .keyBy(0)
       .intervalJoin(operator2.keyBy(0))
       .between(Time.milliseconds(-2), Time.milliseconds(1))
-      .process(new ProcessJoinFunction[(String, Long), (String, Long), String] {
-        override def processElement(left: (String, Long), right: (String, Long), ctx: ProcessJoinFunction[(String, Long), (String, Long), String]#Context, out: Collector[String]): Unit = {
-          out.collect(null)
+      .process(new ProcessJoinFunction[(String, Long), (String, Long), (String, Long)] {
+        override def processElement(left: (String, Long), right: (String, Long), ctx: ProcessJoinFunction[(String, Long), (String, Long), (String, Long)]#Context, out: Collector[(String, Long)]): Unit = {
+          out.collect((left._1, left._2 + right._2))
         }
       }).print()
     env.execute("IntervalJoin")
 
   }
 
+
+  /**
+    * watermark时间抽取
+    */
   class CustomWatermarkExtractor extends AssignerWithPeriodicWatermarks[String] {
 
     var currentTimestamp = Long.MinValue

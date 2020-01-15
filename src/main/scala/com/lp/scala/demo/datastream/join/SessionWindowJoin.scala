@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.watermark.Watermark
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
+import org.apache.flink.streaming.api.windowing.assigners.{ProcessingTimeSessionWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.{Trigger, TriggerResult}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
@@ -24,7 +24,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
   * <li>Date: 2019-05-08 19:52</li> 
   * 测试的时候将kafkaProduce中类kv数据生成方法 join情况打开
   */
-object TumblingWindowJoin {
+object SessionWindowJoin {
   def main(args: Array[String]): Unit = {
 
     //构建运行时环境
@@ -75,27 +75,23 @@ object TumblingWindowJoin {
         }
       })
 
-    val joinDs = operator1
+    operator1
       .join(operator2)
       .where(elem => elem._1)
-      .equalTo(elem => elem._1)      //注意单位  注意单位！！！！！Time.minutes(1)
-      .window(TumblingEventTimeWindows.of(Time.minutes(1))) //窗口分配器定义程序
+      .equalTo(elem => elem._1) //注意单位  注意单位！！！！！Time.minutes(1)
+      .window(ProcessingTimeSessionWindows.withGap(Time.seconds(10))) //窗口分配器定义程序
       .apply(new JoinFunction[(String, Long), (String, Long), (String, Long, Long)] {
-      override def join(first: (String, Long), second: (String, Long)): (String, Long, Long) = {
-        (first._1, first._2, second._2)
-      }
-    })
-
-    //设置触发器
-    joinDs
+        override def join(first: (String, Long), second: (String, Long)): (String, Long, Long) = {
+          (first._1, first._2, second._2)
+        }
+      })
       .keyBy(_._1)
-      .window(TumblingEventTimeWindows.of(Time.milliseconds(5)))
-      .trigger(new CustomProcessTimeTrigger)
       .reduce((e1, e2) => {
         (e1._1, e1._2 + e2._2, e1._3 + e2._3) //聚合操作
       }).print()
 
-    env.execute("TumblingWindowJoin")
+
+    env.execute("SessionWindowJoin")
 
   }
 
