@@ -13,9 +13,17 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferingSink
-        implements SinkFunction<Tuple2<String, Integer>>,
-        CheckpointedFunction {
+/**
+ * <p/>
+ * <li>title: </li>
+ * <li>@author: li.pan</li>
+ * <li>Date: 2020/1/16 1:32 下午</li>
+ * <li>Version: V1.0</li>
+ * <li>Description:
+ * https://blog.csdn.net/shenshouniu/article/details/84453692
+ * </li>
+ */
+public class BufferingSink implements SinkFunction<Tuple2<String, Integer>>, CheckpointedFunction {
 
     private final int threshold;
 
@@ -32,7 +40,7 @@ public class BufferingSink
     public void invoke(Tuple2<String, Integer> value) throws Exception {
         bufferedElements.add(value);
         if (bufferedElements.size() == threshold) {
-            for (Tuple2<String, Integer> element: bufferedElements) {
+            for (Tuple2<String, Integer> element : bufferedElements) {
                 // send it to the sink
             }
             bufferedElements.clear();
@@ -52,7 +60,8 @@ public class BufferingSink
         ListStateDescriptor<Tuple2<String, Integer>> descriptor =
                 new ListStateDescriptor<>(
                         "buffered-elements",
-                        TypeInformation.of(new TypeHint<Tuple2<String, Integer>>() {}));
+                        TypeInformation.of(new TypeHint<Tuple2<String, Integer>>() {
+                        }));
 
         checkpointedState = context.getOperatorStateStore().getListState(descriptor);
 

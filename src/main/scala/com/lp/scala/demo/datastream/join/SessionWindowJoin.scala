@@ -60,7 +60,7 @@ object SessionWindowJoin {
 
     import org.apache.flink.api.scala._
     val operator1 = env.addSource(kafkaConsumer1)
-      .map(new RichMapFunction[String, (String, Long)] { //对kafka中的数据进行转换
+      .map(new RichMapFunction[String, (String, Long)] {
         override def map(value: String): (String, Long) = {
           val splits = value.split(" ")
           (splits(0), splits(1).toLong)
@@ -68,7 +68,7 @@ object SessionWindowJoin {
       })
 
     val operator2 = env.addSource(kafkaConsumer2)
-      .map(new RichMapFunction[String, (String, Long)] { //对kafka中的数据进行转换
+      .map(new RichMapFunction[String, (String, Long)] {
         override def map(value: String): (String, Long) = {
           val splits = value.split(" ")
           (splits(0), splits(1).toLong)
@@ -78,7 +78,7 @@ object SessionWindowJoin {
     operator1
       .join(operator2)
       .where(elem => elem._1)
-      .equalTo(elem => elem._1) //注意单位  注意单位！！！！！Time.minutes(1)
+      .equalTo(elem => elem._1) //注意单位  Time.minutes(1)
       .window(ProcessingTimeSessionWindows.withGap(Time.seconds(10))) //窗口分配器定义程序
       .apply(new JoinFunction[(String, Long), (String, Long), (String, Long, Long)] {
         override def join(first: (String, Long), second: (String, Long)): (String, Long, Long) = {

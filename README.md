@@ -196,15 +196,25 @@ Flink中`异步I/O`的开发步骤大致如下：
 
 ### 不同数据流join
 
-```
-// TODO 等待更新中…...
-```
+`window join`将共享相同`key`并位于同一窗口中的两个流的元素联接在一起。可以使用窗口分配器定义这些窗口，并根据两个流中的元素对其进行评估。然后将双方的元素传递到用户定义的`JoinFunction`或`FlatJoinFunction`，在此用户可以发出满足联接条件的结果。
+
+`Interval Join`使用公共`key`连接两个流（现在将它们分别称为A和B）的元素，并且流B的元素具有与流A的元素时间戳**相对时间间隔的时间戳**。
+
+- Tumbling Window Join
+- Sliding Window Join
+- Session Window Join
+- Interval Join
+
+代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/join)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/join)
 
 ### DataStream Sink
 
-```
-// TODO 等待更新中…...
-```
+sink是将数据源最终写入文件或者数据库或者其他中间件当中。
+`writeAsText()`：将元素以字符串形式逐行写入，这些字符串通过调用每个元素的toString()方法来获取。`print() / printToErr()`：打印每个元素的toString()方法的值到标准输出或者标准错误输出流中。
+同时Flink DataStream也支持自定义输出addSink【kafka、redis、Mysql、Hbase等】外部数据源。
+内置的Connectors可参考[官网](https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/connectors/)：https://ci.apache.org/projects/flink/flink-docs-release-1.9/dev/connectors/
+
+针对于Mysql、Hbase、Redis可参考代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/sink)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/sink)
 
 ## 3、高级应用
 

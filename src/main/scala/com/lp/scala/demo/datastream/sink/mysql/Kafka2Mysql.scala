@@ -65,11 +65,10 @@ object Kafka2Mysql {
       })
       .timeWindowAll(Time.seconds(20))
       .trigger(new CustomProcessTimeTrigger)
-    windowStream.min(0).print("1234")
+
 
     val sum: DataStream[Int] = windowStream.sum(0)
 
-    sum.print("xxxxxxx")
     sum.addSink(new CustomJdbcSink)
 
     env.execute("Kafka2Mysql")
@@ -92,7 +91,7 @@ object Kafka2Mysql {
       //随便写一张表
       Class.forName("com.mysql.jdbc.Driver")
       conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "1234")
-      val sql = s"insert into kafka_sum(total) values (?)"
+      val sql = s"insert into flink_test (sum_value) values (?)"
 
       println(s"$conn 执行mysql写操作")
       ps = conn.prepareStatement(sql)
