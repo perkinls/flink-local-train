@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.example;
+package com.lp.java.demo.datastream.source.function;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;

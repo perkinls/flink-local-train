@@ -1,5 +1,10 @@
-package com.lp.java.demo.datastream.example;
+package com.lp.java.demo.datastream.source;
 
+import com.lp.java.demo.commons.BaseStreamingEnv;
+import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.source.function.JavaCustomNonParallelSourceFunction;
+import com.lp.java.demo.datastream.source.function.JavaCustomParallelSourceFunction;
+import com.lp.java.demo.datastream.source.function.JavaCustomRichParallelSourceFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -11,40 +16,43 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * <li>Version: V1.0</li>
  * <li>Description: Source</li>
  */
-public class JavaDataStreamSourceApp {
+public class DataStreamSourceApp extends BaseStreamingEnv<Object> implements IBaseRunApp {
 
-    public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-//        socketFunction(env);
+    @Override
+    public void doMain() throws Exception {
+        socketFunction(env);
 //        nonParallelSourceFunction(env);
 //        parallelSourceFunction(env);
 //        richParallelSourceFunction(env);
 
         env.execute("JavaDataStreamSourceApp");
+
     }
 
 
-    public static void richParallelSourceFunction(StreamExecutionEnvironment env) {
+    public void richParallelSourceFunction(StreamExecutionEnvironment env) {
         DataStreamSource<Long> data = env.addSource(new JavaCustomRichParallelSourceFunction()).setParallelism(2);
         data.print().setParallelism(1);
     }
 
 
-    public static void parallelSourceFunction(StreamExecutionEnvironment env) {
+    public void parallelSourceFunction(StreamExecutionEnvironment env) {
         DataStreamSource<Long> data = env.addSource(new JavaCustomParallelSourceFunction()).setParallelism(2);
         data.print().setParallelism(1);
     }
 
 
-    public static void nonParallelSourceFunction(StreamExecutionEnvironment env) {
+    public void nonParallelSourceFunction(StreamExecutionEnvironment env) {
         DataStreamSource<Long> data = env.addSource(new JavaCustomNonParallelSourceFunction());
-                //.setParallelism(2);
+        //.setParallelism(2);
         data.print().setParallelism(1);
     }
 
-    public static void socketFunction(StreamExecutionEnvironment env) {
-        DataStreamSource<String> data =  env.socketTextStream("localhost", 9999);
+    public void socketFunction(StreamExecutionEnvironment env) {
+        DataStreamSource<String> data = env.socketTextStream("localhost", 9999);
         data.print().setParallelism(1);
     }
+
+
 }

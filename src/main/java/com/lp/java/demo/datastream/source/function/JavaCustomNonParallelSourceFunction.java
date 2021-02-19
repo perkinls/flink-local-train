@@ -1,15 +1,14 @@
-package com.lp.java.demo.datastream.example;
+package com.lp.java.demo.datastream.source.function;
 
-import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction;
-
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 /**
- * <p/>
- * <li>Description: 自定义source并行</li>
- * <li>@author: panli0226@sina.com</li>
- * <li>Date: 2019-04-15 13:28</li>
+ * <p/> 
+ * <li>Description: </li>
+ * <li>@author: panli0226@sina.com</li> 
+ * <li>Date: 2019-04-15 13:21</li> 
  */
-public class JavaCustomParallelSourceFunction implements ParallelSourceFunction<Long> {
+public class JavaCustomNonParallelSourceFunction implements SourceFunction<Long> {
     boolean isRunning = true;
     long count = 1;
 
