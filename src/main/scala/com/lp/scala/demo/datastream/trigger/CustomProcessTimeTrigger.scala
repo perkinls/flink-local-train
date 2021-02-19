@@ -55,7 +55,7 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
   }
 
   /**
-    * 处理事件time出发的时候会被调用
+    * 处理事件(Process Time)time出发的时候会被调用
     *
     * @param time
     * @param window
@@ -65,7 +65,7 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
   override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = TriggerResult.FIRE_AND_PURGE
 
   /**
-    * 窗口事件时间time end的时候被调用
+    * 窗口事件时间(Event Time)time end的时候被调用
     *
     * @param time
     * @param window
@@ -86,7 +86,7 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
   override def clear(window: TimeWindow, ctx: Trigger.TriggerContext) = ctx.deleteProcessingTimeTimer(window.maxTimestamp)
 
   /**
-    * 有状态的触发器相关，并在他们相应的窗口合并时合并两个触发器的状态，例如使用会话窗口
+    * 有状态的触发器相关，并在他们相应的窗口合并时合并两个触发器的状态，例如:使用会话窗口
     *
     * @param window
     * @param ctx
@@ -96,7 +96,10 @@ class CustomProcessTimeTrigger extends Trigger[Int, TimeWindow] {
     // this is in line with the logic in onElement(). If the time is past the end of
     // the window onElement() will fire and setting a timer here would fire the window twice.
     val windowMaxTimestamp = window.maxTimestamp
-    if (windowMaxTimestamp > ctx.getCurrentProcessingTime) ctx.registerProcessingTimeTimer(windowMaxTimestamp)
+    // 窗口最大时间大于 当前处理时间
+    if (windowMaxTimestamp > ctx.getCurrentProcessingTime)
+
+      ctx.registerProcessingTimeTimer(windowMaxTimestamp)
   }
 
   override def toString: String = "ProcessingTimeTrigger()"

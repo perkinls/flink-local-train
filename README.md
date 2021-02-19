@@ -97,7 +97,7 @@ Flink中累加器的开发步骤大致如下：
 目前累加器的结果只有在整个工作结束之后才可以使用。我们还计划在下一次迭代中可以使用前一次迭代的结果。你可以使用聚合器来计算每次迭代的统计信息，并基于此类统计信息来终止迭代。
 ```
 
-代码案例：[Java](/src/main/java/com/lp/java/demo/common/JavaCounterApp.java)  [Scala](/src/main/scala/com/lp/scala/demo/common/CountApp.scala)
+代码案例：[Java](/com/lp/java/demo/pojo/JavaCounterApp.java)  [Scala](/src/main/scala/com/lp/scala/demo/common/CountApp.scala)
 
 ### 分布式缓存
 

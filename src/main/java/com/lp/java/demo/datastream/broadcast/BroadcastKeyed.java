@@ -15,7 +15,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
 
@@ -34,7 +34,7 @@ public class BroadcastKeyed {
         properties.setProperty("bootstrap.servers", "mt-mdh.local:9093");
         properties.setProperty("group.id", "BroadcastKeyed");
 
-        FlinkKafkaConsumer010<String> kafkaConsumer010 = new FlinkKafkaConsumer010<>("KV",
+        FlinkKafkaConsumer<String> kafkaConsumer010 = new FlinkKafkaConsumer<>("KV",
                 new SimpleStringSchema(),
                 properties);
 

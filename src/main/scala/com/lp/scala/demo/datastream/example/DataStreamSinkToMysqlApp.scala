@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 
 /**
   * <p/> 
-  * <li>Description: TODO</li>
+  * <li>Description: Sink测试，写入Mysql</li>
   * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-15 21:34</li> 
   */

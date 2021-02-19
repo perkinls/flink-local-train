@@ -9,7 +9,7 @@ import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunc
 
 /**
   * <p/> 
-  * <li>Description: 写入Mysql公用类别</li>
+  * <li>Description: 写入Mysql</li>
   * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-15 21:41</li> 
   */
@@ -50,7 +50,7 @@ class CustomSinkToMysql extends RichSinkFunction[person] {
     * @throws Exception
     */
   @throws[Exception]
-  override def invoke(value: person, context: SinkFunction.Context[_]): Unit = {
+  override def invoke(value: person, context: SinkFunction.Context): Unit = {
     System.out.println("invoke~~~~~~~~~")
     // 未前面的占位符赋值
     ps.setInt(1, value.id)

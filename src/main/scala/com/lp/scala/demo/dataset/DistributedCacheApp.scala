@@ -11,7 +11,7 @@ import org.apache.flink.configuration.Configuration
   * <li>@author: li.pan</li>
   * <li>Date: 2019/11/23 2:15 下午</li>
   * <li>Version: V1.0</li>
-  * <li>Description:
+  * <li>Description: 类似于广播，在执行时TaskManager会把缓存文件拉到本地
   * step1: 注册一个本地/HDFS文件
   * step2：在open方法中获取到分布式缓存的内容即可
   * </li>

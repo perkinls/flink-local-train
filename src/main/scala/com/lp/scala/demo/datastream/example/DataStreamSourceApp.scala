@@ -15,9 +15,9 @@ object DataStreamSourceApp {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 
-    socketStream(env)
-    nonParallelSourceFunction(env)
-    parallelSourceFunction(env)
+//    socketStream(env)
+//    nonParallelSourceFunction(env)
+//    parallelSourceFunction(env)
     richParallelSourceFunction(env)
 
     env.execute("DataStreamSourceApp")
@@ -32,7 +32,7 @@ object DataStreamSourceApp {
   def richParallelSourceFunction(env: StreamExecutionEnvironment) = {
 
     import org.apache.flink.api.scala._
-    val data = env.addSource(new CustomParallelSourceFunction).setParallelism(2)
+    val data = env.addSource(new CustomRichParallelSourceFunction).setParallelism(2)
     data.print()
   }
 

@@ -11,7 +11,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
 import org.apache.flink.streaming.api.watermark.Watermark;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import javax.annotation.Nullable;
 import java.util.Properties;
@@ -55,7 +55,7 @@ public class ProcessFunctionTimeout {
         properties.setProperty("bootstrap.servers", "mt-mdh.local:9093");
         properties.setProperty("group.id", "ProcessFunctionTimeout");
 
-        FlinkKafkaConsumer010<String> kafkaConsumer010 = new FlinkKafkaConsumer010<>("KV",
+        FlinkKafkaConsumer<String> kafkaConsumer010 = new FlinkKafkaConsumer<>("KV",
                 new SimpleStringSchema(),
                 properties);
 

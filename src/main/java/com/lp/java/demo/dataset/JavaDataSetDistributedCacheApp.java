@@ -15,7 +15,7 @@ import java.util.List;
  * <li>@author: li.pan</li>
  * <li>Date: 2019/12/29 16:10 下午</li>
  * <li>Version: V1.0</li>
- * <li>Description: </li>
+ * <li>Description: 类似于广播，在执行时TaskManager会把缓存文件拉到本地</li>
  */
 public class JavaDataSetDistributedCacheApp {
 

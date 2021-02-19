@@ -7,6 +7,7 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction
   * <li>Description: 自定义source非并行</li>
   * <li>@author: panli0226@sina.com</li> 
   * <li>Date: 2019-04-15 13:21</li> 
+  * -->并行度只能设置为1
   */
 class CustomNonParallelSourceFunction extends SourceFunction[Long] {
 
