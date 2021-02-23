@@ -1,6 +1,7 @@
 package com.lp.java.demo.datastream;
 
-import com.lp.java.demo.datastream.source.DataStreamSourceApp;
+import com.lp.java.demo.datastream.asyncio.AsyncIoTableJoinMysql;
+import com.lp.java.demo.datastream.asyncio.AsyncIoTableJoinRedis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +16,15 @@ public class StreamingRunApp {
 
     public static void main(String[] args) {
         try {
-            new DataStreamSourceApp().doMain();
-
+//            new DataStreamWordCountApp().doMain();
+//            new DataStreamTransformApp().doMain();
+//            new DataStreamSourceApp().doMain();
+//            new KafkaSourceApp().doMain();
+//            new AsyncIoFlatMapJoin().doMain();
+            new AsyncIoTableJoinMysql().doMain();
+//            new AsyncIoTableJoinRedis().doMain();
         } catch (Exception e) {
-            log.error("程序处理错误～!");
+            log.error("流计算程序处理错误!");
             e.printStackTrace();
         }
 

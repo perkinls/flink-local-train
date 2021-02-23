@@ -1,8 +1,8 @@
-package com.lp.java.demo.datastream.broadcast;
+package com.lp.java.demo.datastream.processfunction;
 
-import com.lp.java.demo.datastream.broadcast.Util.FileUtil;
-import com.lp.java.demo.datastream.broadcast.Util.PrepareBroadCastData;
-import com.lp.java.demo.datastream.util.Split2KV;
+import com.lp.java.demo.datastream.processfunction.Util.FileUtil;
+import com.lp.java.demo.datastream.processfunction.Util.PrepareBroadCastData;
+import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
@@ -49,28 +49,32 @@ public class BroadcastKeyed {
                 "RulesBroadcastState",
                 BasicTypeInfo.STRING_TYPE_INFO,
                 BasicTypeInfo.STRING_TYPE_INFO
-                );
+        );
 
         BroadcastStream<Tuple2<String, String>> broadcast = env.fromCollection(PrepareBroadCastData.getBroadcastData()).broadcast(ruleStateDescriptor);
 
 
         SingleOutputStreamOperator<Tuple3<String, String, Long>> res = keyBy.connect(broadcast).
-                process(new KeyedBroadcastProcessFunction<String, Tuple2<String,Long>, Tuple2<String,String>, Tuple3<String,String,Long>>() {
-            MapStateDescriptor<String, String> ruleStateDescriptor = new MapStateDescriptor<>(
-                    "RulesBroadcastState",
-                    BasicTypeInfo.STRING_TYPE_INFO,
-                    BasicTypeInfo.STRING_TYPE_INFO
-            );
-            @Override
-            public void processElement(Tuple2<String, Long> value, ReadOnlyContext ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
-                ReadOnlyBroadcastState<String, String> broadcastState = ctx.getBroadcastState(ruleStateDescriptor);
-                out.collect(new Tuple3<>(value.f0, broadcastState.get(value.f0),value.f1));
-            }
-            @Override
-            public void processBroadcastElement(Tuple2<String, String> value, Context ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
-                ctx.getBroadcastState(ruleStateDescriptor).put(value.f0,value.f1);
-            }
-        });
+                process(new KeyedBroadcastProcessFunction<String, Tuple2<String, Long>, Tuple2<String, String>, Tuple3<String, String, Long>>() {
+                    private static final long serialVersionUID = 3084148678696546522L;
+
+                    MapStateDescriptor<String, String> ruleStateDescriptor = new MapStateDescriptor<>(
+                            "RulesBroadcastState",
+                            BasicTypeInfo.STRING_TYPE_INFO,
+                            BasicTypeInfo.STRING_TYPE_INFO
+                    );
+
+                    @Override
+                    public void processElement(Tuple2<String, Long> value, ReadOnlyContext ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
+                        ReadOnlyBroadcastState<String, String> broadcastState = ctx.getBroadcastState(ruleStateDescriptor);
+                        out.collect(new Tuple3<>(value.f0, broadcastState.get(value.f0), value.f1));
+                    }
+
+                    @Override
+                    public void processBroadcastElement(Tuple2<String, String> value, Context ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
+                        ctx.getBroadcastState(ruleStateDescriptor).put(value.f0, value.f1);
+                    }
+                });
 
         res.writeAsText("/Users/meitu/Desktop/1");
 

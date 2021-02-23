@@ -3,6 +3,8 @@ package com.lp.java.demo.commons.utils;
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
+import com.lp.java.demo.commons.po.config.MysqlConfigPo;
+import com.lp.java.demo.commons.po.config.RedisConfigPo;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
@@ -18,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtils {
 
     private final static Logger log = LoggerFactory.getLogger(ConfigUtils.class);
-    
+
     private static Config rootConfig = ConfigFactory.load("conf/application");
 
     private static String configType;
@@ -34,6 +36,8 @@ public class ConfigUtils {
         Config eleConfig = rootConfig.getConfig(configType);
         loadKafkaConfig(eleConfig);
         loadJobConfig(eleConfig);
+        loadMysqlConfig(eleConfig);
+        loadRedisConfig(eleConfig);
         log.info("加载配置文件初始化完成 ...");
     }
 
@@ -82,6 +86,33 @@ public class ConfigUtils {
         JobConfigPo.checkpointCurrentCheckpoints = checkpointConfig.getInt("current.checkpoints");
         JobConfigPo.checkpointRestartAttempts = checkpointConfig.getInt("restart.attempts.times");
         JobConfigPo.checkpointRestartAttemptsInterval = checkpointConfig.getLong("restart.attempts.interval");
+
+    }
+
+    /**
+     * 加载Mysql相关配置
+     *
+     * @param pConfig job元素节点父节点
+     */
+    private static void loadMysqlConfig(Config pConfig) {
+        Config mysqlConfig = pConfig.getConfig("mysql");
+        MysqlConfigPo.url = mysqlConfig.getString("url");
+        MysqlConfigPo.driver = mysqlConfig.getString("driver");
+        MysqlConfigPo.maxPoolSize = mysqlConfig.getInt("max-pool-size");
+        MysqlConfigPo.maxIdleTime = mysqlConfig.getInt("max-idle-time");
+        MysqlConfigPo.user = mysqlConfig.getString("user");
+        MysqlConfigPo.password = mysqlConfig.getString("password");
+    }
+
+    /**
+     * 加载Mysql相关配置
+     *
+     * @param pConfig job元素节点父节点
+     */
+    private static void loadRedisConfig(Config pConfig) {
+        Config redisConfig = pConfig.getConfig("redis");
+        RedisConfigPo.host = redisConfig.getString("host");
+        RedisConfigPo.port = redisConfig.getInt("port");
 
     }
 }

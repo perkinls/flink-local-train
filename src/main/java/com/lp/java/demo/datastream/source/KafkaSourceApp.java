@@ -1,19 +1,23 @@
 package com.lp.java.demo.datastream.source;
 
-import com.lp.java.demo.commons.po.config.JobConfigPo;
-import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.commons.po.config.JobConfigPo;
+import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.jobgraph.JobVertex;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.triggers.ProcessingTimeTrigger;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * <p/>
@@ -23,34 +27,35 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
  */
 public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRunApp {
 
+    private final static Logger log = LoggerFactory.getLogger(KafkaSourceApp.class);
+
 
     @Override
     public void doMain() throws Exception {
         FlinkKafkaConsumer<String> kafkaConsumer = getKafkaConsumer(KafkaConfigPo.stringTopic, new SimpleStringSchema());
+
+
         AllWindowedStream<Integer, TimeWindow> stream =
                 env
                         .addSource(kafkaConsumer)
                         .map(new String2Integer())
-                        .timeWindowAll(Time.seconds(20))
+                        .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
+                        //.trigger(ProcessingTimeTrigger.create());
+                        // 自定义触发器在满足条件时会出发,窗口结束时也会触发
                         .trigger(CustomProcessingTimeTrigger.create());
 
+        // 聚合所有窗口
         stream.sum(0).print();
 
-        // 获取JobGraph
-        Iterable<JobVertex> vertices = env.getStreamGraph().getJobGraph().getVertices();
-        for (JobVertex vertex : vertices) {
-            System.out.println("=====>" + vertex.getName());
-            System.out.println("=====>" + vertex.getID());
-        }
+        // 获取JobGraph 调用 getStreamGraph 会清除 transformations 避免和 execute并行使用
+//        Iterable<JobVertex> vertices = env.getStreamGraph().getJobGraph().getVertices();
+//        for (JobVertex vertex : vertices) {
+//            log.info("vertex ====>《Name:》 {} 《Id:》 {}", vertex.getName(), vertex.getID());
+//        }
 
-        env.execute(JobConfigPo.jobNamePrefix + KafkaSourceApp.class.getCanonicalName());
-
-    }
+        env.execute(JobConfigPo.jobNamePrefix + KafkaSourceApp.class.getName());
 
 
-    @Override
-    public TimeCharacteristic setTimeCharacter() {
-        return TimeCharacteristic.ProcessingTime;
     }
 
 
@@ -68,4 +73,9 @@ public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRun
         }
     }
 
+
+    @Override
+    public Integer setDefaultParallelism() {
+        return 4;
+    }
 }

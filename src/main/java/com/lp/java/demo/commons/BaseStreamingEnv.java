@@ -9,7 +9,6 @@ import org.apache.flink.runtime.state.StateBackend;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.runtime.state.memory.MemoryStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -62,6 +61,7 @@ public class BaseStreamingEnv<T> {
                         StateBackend fsStateBackend = new FsStateBackend(JobConfigPo.checkPointPath, true);
                         env.setStateBackend(fsStateBackend); //设置checkpoint存储方式和路径目录
                         // TODO RocketsDb
+                        // case "ROCKS_STATE":
                     default:
                 }
 
@@ -78,11 +78,13 @@ public class BaseStreamingEnv<T> {
             }
 
             // 选择设置事件事件和处理事件
-            env.setStreamTimeCharacteristic(setTimeCharacter());
+            // env.setStreamTimeCharacteristic(setTimeCharacter());
+            // 在 Flink 1.12 中，默认的时间属性改变成 EventTime 了
+            setEnableWaterMarker(env);
+
 
             // 设置程序并行度
             env.setParallelism(setDefaultParallelism());
-
             log.info("StreamExecutionEnvironment 环境初始化完成 ...");
             return env;
         } catch (Exception e) {
@@ -183,14 +185,6 @@ public class BaseStreamingEnv<T> {
         return JobConfigPo.checkpointRestartAttemptsInterval;
     }
 
-    /**
-     * 设置默认任务的时间属性
-     *
-     * @return TimeCharacteristic
-     */
-    public TimeCharacteristic setTimeCharacter() {
-        return TimeCharacteristic.EventTime;
-    }
 
     /**
      * 设置默认并行度
@@ -199,6 +193,16 @@ public class BaseStreamingEnv<T> {
      */
     public Integer setDefaultParallelism() {
         return JobConfigPo.defaultParallelism;
+    }
+
+
+    /**
+     * 设置是否开启WaterMaker,0表示禁用,>1启用
+     *
+     * @param env
+     */
+    public void setEnableWaterMarker(StreamExecutionEnvironment env) {
+        env.getConfig().setAutoWatermarkInterval(0);
     }
 
     /**
@@ -238,5 +242,7 @@ public class BaseStreamingEnv<T> {
             throw new RuntimeException("kafka 消费者配置错误！", e);
         }
     }
+
+
 
 }

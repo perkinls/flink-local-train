@@ -1,7 +1,7 @@
 //package com.lp.java.demo.datastream.windows;
 //
 //import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
-//import com.lp.java.demo.datastream.util.Split2KV;
+//import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
 //import com.lp.scala.demo.utils.ConfigUtils;
 //import org.apache.flink.api.common.functions.AggregateFunction;
 //import org.apache.flink.api.common.restartstrategy.RestartStrategies;

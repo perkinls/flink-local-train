@@ -1,7 +1,7 @@
-package com.lp.java.demo.datastream.broadcast;
+package com.lp.java.demo.datastream.processfunction;
 
-import com.lp.java.demo.datastream.broadcast.Util.FileUtil;
-import com.lp.java.demo.datastream.broadcast.Util.PrepareBroadCastData;
+import com.lp.java.demo.datastream.processfunction.Util.FileUtil;
+import com.lp.java.demo.datastream.processfunction.Util.PrepareBroadCastData;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -14,7 +14,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
-import com.lp.java.demo.datastream.util.Split2KV;
+import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
 
 import java.util.Properties;
 
@@ -44,29 +44,37 @@ public class BroadcastNoneKeyed {
                 "RulesBroadcastState",
                 BasicTypeInfo.STRING_TYPE_INFO,
                 BasicTypeInfo.STRING_TYPE_INFO
-                );
+        );
 
-        BroadcastStream<Tuple2<String, String>> broadcast = env.fromCollection(PrepareBroadCastData.getBroadcastData()).broadcast(ruleStateDescriptor);
+        BroadcastStream<Tuple2<String, String>> broadcast = env
+                .fromCollection(PrepareBroadCastData.getBroadcastData())
+                .broadcast(ruleStateDescriptor);
 
 
-        SingleOutputStreamOperator<Tuple3<String, String, Long>> res = noneKeyed.connect(broadcast).process(new BroadcastProcessFunction<Tuple2<String,Long>, Tuple2<String,String>, Tuple3<String,String,Long>>() {
-            MapStateDescriptor<String, String> ruleStateDescriptor = new MapStateDescriptor<>(
-                    "RulesBroadcastState",
-                    BasicTypeInfo.STRING_TYPE_INFO,
-                    BasicTypeInfo.STRING_TYPE_INFO
-            );
-            @Override
-            public void processElement(Tuple2<String, Long> value, ReadOnlyContext ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
-                out.collect(new Tuple3<>(value.f0,ctx.getBroadcastState(ruleStateDescriptor).get(value.f0),value.f1));
+        SingleOutputStreamOperator<Tuple3<String, String, Long>> res =
+                noneKeyed
+                        .connect(broadcast)
+                        .process(new BroadcastProcessFunction<Tuple2<String, Long>, Tuple2<String, String>, Tuple3<String, String, Long>>() {
 
-            }
+                            private static final long serialVersionUID = 6212404377214953324L;
+                            MapStateDescriptor<String, String> ruleStateDescriptor = new MapStateDescriptor<>(
+                                    "RulesBroadcastState",
+                                    BasicTypeInfo.STRING_TYPE_INFO,
+                                    BasicTypeInfo.STRING_TYPE_INFO
+                            );
 
-            @Override
-            public void processBroadcastElement(Tuple2<String, String> value, Context ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
-                ctx.getBroadcastState(ruleStateDescriptor).put(value.f0,value.f1);
+                            @Override
+                            public void processElement(Tuple2<String, Long> value, ReadOnlyContext ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
+                                out.collect(new Tuple3<>(value.f0, ctx.getBroadcastState(ruleStateDescriptor).get(value.f0), value.f1));
 
-            }
-        });
+                            }
+
+                            @Override
+                            public void processBroadcastElement(Tuple2<String, String> value, Context ctx, Collector<Tuple3<String, String, Long>> out) throws Exception {
+                                ctx.getBroadcastState(ruleStateDescriptor).put(value.f0, value.f1);
+
+                            }
+                        });
 
         res.writeAsText("/Users/meitu/Desktop/1");
 

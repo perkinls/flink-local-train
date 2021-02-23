@@ -2,9 +2,10 @@ package com.lp.java.demo.datastream.source;
 
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
-import com.lp.java.demo.datastream.source.function.JavaCustomNonParallelSourceFunction;
-import com.lp.java.demo.datastream.source.function.JavaCustomParallelSourceFunction;
-import com.lp.java.demo.datastream.source.function.JavaCustomRichParallelSourceFunction;
+import com.lp.java.demo.commons.po.config.JobConfigPo;
+import com.lp.java.demo.datastream.source.function.CustomNonParallelSourceFunction;
+import com.lp.java.demo.datastream.source.function.CustomParallelSourceFunction;
+import com.lp.java.demo.datastream.source.function.CustomRichParallelSourceFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -26,25 +27,25 @@ public class DataStreamSourceApp extends BaseStreamingEnv<Object> implements IBa
 //        parallelSourceFunction(env);
 //        richParallelSourceFunction(env);
 
-        env.execute("JavaDataStreamSourceApp");
+        env.execute(JobConfigPo.jobNamePrefix + DataStreamSourceApp.class.getName());
 
     }
 
 
     public void richParallelSourceFunction(StreamExecutionEnvironment env) {
-        DataStreamSource<Long> data = env.addSource(new JavaCustomRichParallelSourceFunction()).setParallelism(2);
+        DataStreamSource<Long> data = env.addSource(new CustomRichParallelSourceFunction()).setParallelism(2);
         data.print().setParallelism(1);
     }
 
 
     public void parallelSourceFunction(StreamExecutionEnvironment env) {
-        DataStreamSource<Long> data = env.addSource(new JavaCustomParallelSourceFunction()).setParallelism(2);
+        DataStreamSource<Long> data = env.addSource(new CustomParallelSourceFunction()).setParallelism(2);
         data.print().setParallelism(1);
     }
 
 
     public void nonParallelSourceFunction(StreamExecutionEnvironment env) {
-        DataStreamSource<Long> data = env.addSource(new JavaCustomNonParallelSourceFunction());
+        DataStreamSource<Long> data = env.addSource(new CustomNonParallelSourceFunction());
         //.setParallelism(2);
         data.print().setParallelism(1);
     }

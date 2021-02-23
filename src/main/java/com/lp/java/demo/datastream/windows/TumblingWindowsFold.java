@@ -13,7 +13,7 @@
 //import org.apache.flink.streaming.api.windowing.time.Time;
 //import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 //import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
-//import com.lp.java.demo.datastream.util.Split2KV;
+//import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
 //import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 //
 //import java.util.Properties;

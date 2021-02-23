@@ -1,6 +1,7 @@
 package com.lp.java.demo.datastream.richfunction;
 
 import com.lp.java.demo.commons.po.StudentPo;
+import com.lp.java.demo.commons.po.config.MysqlConfigPo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
@@ -16,17 +17,17 @@ import java.sql.PreparedStatement;
  * <li>Version: V1.0</li>
  * <li>Description: Sink写出到Mysql</li>
  */
-public class SinkToMysql extends RichSinkFunction<StudentPo>{
+public class SinkToMysql extends RichSinkFunction<StudentPo> {
     Connection connection;
     PreparedStatement ps;
 
     private Connection getConnection() {
         Connection conn = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName(MysqlConfigPo.driver);
 
-            String url = "jdbc:mysql://localhost:3306/flink_demo";
-            conn = DriverManager.getConnection(url,"root","1234");
+            String url = MysqlConfigPo.url;
+            conn = DriverManager.getConnection(url, MysqlConfigPo.user, MysqlConfigPo.password);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,6 +38,7 @@ public class SinkToMysql extends RichSinkFunction<StudentPo>{
 
     /**
      * 在open方法中建立connection
+     *
      * @param parameters
      * @throws Exception
      */
@@ -68,17 +70,18 @@ public class SinkToMysql extends RichSinkFunction<StudentPo>{
 
     /**
      * 在close方法中要释放资源
+     *
      * @throws Exception
      */
     @Override
     public void close() throws Exception {
         super.close();
 
-        if(ps != null) {
+        if (ps != null) {
             ps.close();
         }
 
-        if(connection != null) {
+        if (connection != null) {
             connection.close();
         }
     }

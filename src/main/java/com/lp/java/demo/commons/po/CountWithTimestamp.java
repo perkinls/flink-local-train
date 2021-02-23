@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.processfunction;
+package com.lp.java.demo.commons.po;
 
 public class CountWithTimestamp {
     public String key;

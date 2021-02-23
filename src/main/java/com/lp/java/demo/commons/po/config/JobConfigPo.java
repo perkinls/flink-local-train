@@ -72,9 +72,4 @@ public class JobConfigPo implements Serializable {
      */
     public static Long checkpointRestartAttemptsInterval;
 
-
-    /**
-     * 任务名
-     */
-    public static String jobName;
 }

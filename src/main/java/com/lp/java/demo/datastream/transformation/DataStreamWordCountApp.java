@@ -1,5 +1,8 @@
-package com.lp.java.demo.quickstart;
+package com.lp.java.demo.datastream.transformation;
 
+import com.lp.java.demo.commons.BaseStreamingEnv;
+import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.commons.po.config.JobConfigPo;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -7,6 +10,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
@@ -20,49 +24,31 @@ import org.apache.flink.util.Collector;
  * wc统计的数据我们源自于socket  nc -l 9999
  * </li>
  */
-public class StreamingWcJavaApp {
+public class DataStreamWordCountApp extends BaseStreamingEnv<Object> implements IBaseRunApp {
 
+    @Override
+    public void doMain() throws Exception {
 
-    public static void main(String[] args) throws Exception {
-
-        // step1 ：获取执行环境
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-
-        // step2：读取数据
+        // 读取数据
         DataStreamSource<String> text = env.socketTextStream("localhost", 9999);
 
 
-        // step3: transform
-
-        //text.flatMap(new MyFlatMapFunction())   //.keyBy("word")
-        text.flatMap(new RichFlatMapFunction<String, WordCount>() {
-            @Override
-            public void flatMap(String value, Collector<WordCount> collector) throws Exception {
-                String[] tokens = value.toLowerCase().split(",");
-                for (String token : tokens) {
-                    if (token.length() > 0) {
-                        collector.collect(new WordCount(token.trim(), 1));
-                    }
-                }
-            }
-        })
-                .keyBy(new KeySelector<WordCount, String>() {
-
-                    @Override
-                    public String getKey(WordCount wc) throws Exception {
-                        return wc.word;
-                    }
-                }).timeWindow(Time.seconds(5))
-                .sum("count").print()
-                .setParallelism(1);
+        // transform
+        text.flatMap(new MyFlatMapFunction())   //.keyBy("word")
+                .keyBy((KeySelector<WordCount, String>) wc -> wc.word)
+                // window和windowAll一个可以设置并行度，一个不能设置并行度
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+                .sum("count")
+                .print();
 
 
-        env.execute("StreamingWCJavaApp");
+        env.execute(JobConfigPo.jobNamePrefix + DataStreamTransformApp.class.getName());
     }
 
 
     public static class MyFlatMapFunction implements FlatMapFunction<String, WordCount> {
+
+        private static final long serialVersionUID = -8175276189585341878L;
 
         @Override
         public void flatMap(String value, Collector<WordCount> collector) throws Exception {

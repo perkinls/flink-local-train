@@ -127,7 +127,7 @@
             <version>${flink.version}</version>
         </dependency>
 
-        <!--flink异步IO相关依赖-->
+        <!-- 异步框架-->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-jdbc-client</artifactId>
@@ -149,12 +149,13 @@
             <version>1.0.1-RC1</version>
         </dependency>
 
-        <!--缓存相关依赖-->
+        <!-- 本地缓存-->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <!-- 分布式缓存-->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
