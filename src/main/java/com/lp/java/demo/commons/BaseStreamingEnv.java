@@ -3,6 +3,7 @@ package com.lp.java.demo.commons;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.commons.utils.ConfigUtils;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.runtime.state.StateBackend;
@@ -202,7 +203,14 @@ public class BaseStreamingEnv<T> {
      * @param env
      */
     public void setEnableWaterMarker(StreamExecutionEnvironment env) {
-        env.getConfig().setAutoWatermarkInterval(0);
+        env.getConfig().setAutoWatermarkInterval(setWaterMarkerInterval());
+    }
+
+    /**
+     * 设置是否开启WaterMaker,0表示禁用,>1启用
+     */
+    public long setWaterMarkerInterval() {
+        return 0;
     }
 
     /**
@@ -235,6 +243,7 @@ public class BaseStreamingEnv<T> {
 
             // 从topic中指定的group上次消费的位置开始消费，必须配置group.id参数
             kafkaConsumer.setStartFromGroupOffsets();
+//            kafkaConsumer.assignTimestampsAndWatermarks();
 
             log.info("kafka 消费者配置完成 ...");
             return kafkaConsumer;
@@ -243,6 +252,8 @@ public class BaseStreamingEnv<T> {
         }
     }
 
-
+//    public WatermarkStrategy<T> setWatermarkStrategy(){
+//
+//    }
 
 }

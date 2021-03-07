@@ -4,6 +4,8 @@ import net.sf.json.JSONObject;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
  * @createTime 2021年02月22日 19:32:00
  */
 public class JsonDeserializationSchema implements SerializationSchema<JSONObject>, DeserializationSchema<JSONObject> {
+
 
     private static final long serialVersionUID = -2093569796162875267L;
 
