@@ -3,7 +3,7 @@ package com.lp.java.demo.datastream.join;
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -41,11 +41,11 @@ public class DoubleStreamIntervalJoin extends BaseStreamingEnv<String> implement
 
         SingleOutputStreamOperator<Tuple2<String, Long>> operator = env
                 .addSource(consumerKv1)
-                .map(new Split2KV());
+                .map(new RichMapSplit2KV());
 
         SingleOutputStreamOperator<Tuple2<String, Long>> operator1 = env
                 .addSource(consumerKv2)
-                .map(new Split2KV());
+                .map(new RichMapSplit2KV());
 
         operator
                 .keyBy((KeySelector<Tuple2<String, Long>, Tuple>) value -> value)

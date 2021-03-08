@@ -65,4 +65,14 @@ public class KafkaConfigPo implements Serializable {
      * kv Topic
      */
     public static String kvTopic2;
+
+    /**
+     * event Topic
+     */
+    public static String eventTopic;
+
+    /**
+     * sensor Topic
+     */
+    public static String sensorTopic;
 }

@@ -4,7 +4,7 @@ import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -40,7 +40,7 @@ public class SessionWindowsAggregateFunction extends BaseStreamingEnv<String> im
          */
         SingleOutputStreamOperator<Double> aggregate = env
                 .addSource(kafkaConsumer)
-                .map(new Split2KV())
+                .map(new RichMapSplit2KV())
 //                .windowAll(ProcessingTimeSessionWindows.withGap(Time.seconds(10)))
 //                .windowAll(EventTimeSessionWindows.withGap(Time.seconds(10)))
                 .windowAll(ProcessingTimeSessionWindows.withDynamicGap((element) -> {

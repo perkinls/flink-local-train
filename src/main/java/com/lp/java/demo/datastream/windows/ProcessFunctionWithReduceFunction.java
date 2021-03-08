@@ -4,7 +4,7 @@ import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -34,7 +34,7 @@ public class ProcessFunctionWithReduceFunction extends BaseStreamingEnv<String> 
         // 转换和窗口计算
         SingleOutputStreamOperator<Tuple3<Tuple2<String, Long>,Long, Long>> reduce = env
                 .addSource(kafkaConsumer)
-                .map(new Split2KV())
+                .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
                 .reduce(new MyReduceFunction(), new MyProcessWindowFunction());

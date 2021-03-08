@@ -3,7 +3,7 @@ package com.lp.java.demo.datastream.windows;
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -29,7 +29,7 @@ public class SlidingWindowsReduceFunction extends BaseStreamingEnv<String> imple
 
         SingleOutputStreamOperator<Tuple2<String, Long>> reduce = env
                 .addSource(kafkaConsumer)
-                .map(new Split2KV())
+                .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
 //                .windowAll(SlidingEventTimeWindows.of(Time.seconds(10),Time.seconds(10)))
                 .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(10)))

@@ -4,7 +4,7 @@ import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -31,7 +31,7 @@ public class TumblingWindowsReduceFunction extends BaseStreamingEnv<String> impl
 
         SingleOutputStreamOperator<Tuple2<String, Long>> fold = env
                 .addSource(kafkaConsumer)
-                .map(new Split2KV())
+                .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
                 .trigger(CustomProcessingTimeTrigger.create())

@@ -3,7 +3,6 @@ package com.lp.java.demo.commons;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.commons.utils.ConfigUtils;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.runtime.state.StateBackend;
@@ -46,7 +45,7 @@ public class BaseStreamingEnv<T> {
         try {
             final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-            if (JobConfigPo.enableCheckpoint) { // 开启checkpoint
+            if (enableCheckpoint()) { // 开启checkpoint
 
                 env.enableCheckpointing(setCheckpointInterval(), setCheckPointingMode());// 设置恰一次处理语义和checkpoint基础配置项
                 env.getCheckpointConfig().setCheckpointTimeout(setCheckpointTimeout()); // CheckPoint超时时间
@@ -94,6 +93,14 @@ public class BaseStreamingEnv<T> {
 
     }
 
+    /**
+     * 是否开启checkpoint
+     *
+     * @return
+     */
+    public Boolean enableCheckpoint() {
+        return JobConfigPo.enableCheckpoint;
+    }
 
     /**
      * 设置默认checkpoint时间间隔
@@ -252,8 +259,5 @@ public class BaseStreamingEnv<T> {
         }
     }
 
-//    public WatermarkStrategy<T> setWatermarkStrategy(){
-//
-//    }
 
 }

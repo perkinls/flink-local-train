@@ -1,10 +1,7 @@
 package com.lp.java.demo.commons.utils;
 
 import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.po.config.JobConfigPo;
-import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.commons.po.config.MysqlConfigPo;
-import com.lp.java.demo.commons.po.config.RedisConfigPo;
+import com.lp.java.demo.commons.po.config.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
@@ -38,7 +35,14 @@ public class ConfigUtils {
         loadJobConfig(eleConfig);
         loadMysqlConfig(eleConfig);
         loadRedisConfig(eleConfig);
+        loadFileConfig(eleConfig);
         log.info("加载配置文件初始化完成 ...");
+    }
+
+    private static void loadFileConfig(Config pConfig) {
+        Config fileConfig = pConfig.getConfig("file");
+        FileConfigPo.localFile=fileConfig.getString("local-file-dir");
+        FileConfigPo.hdfsFile=fileConfig.getString("hdfs-file");
     }
 
     /**
@@ -62,7 +66,8 @@ public class ConfigUtils {
         KafkaConfigPo.jsonTopic = topicConfig.getString("json.topic");
         KafkaConfigPo.kvTopic1 = topicConfig.getString("kv1.topic");
         KafkaConfigPo.kvTopic2 = topicConfig.getString("kv2.topic");
-
+        KafkaConfigPo.eventTopic = topicConfig.getString("event.topic");
+        KafkaConfigPo.sensorTopic = topicConfig.getString("sensor.topic");
     }
 
     /**

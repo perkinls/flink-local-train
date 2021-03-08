@@ -1,5 +1,6 @@
 package com.lp.java.demo.datastream;
 
+import com.lp.java.demo.datastream.process.ProcessFunctionKeyedStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,16 @@ public class StreamingRunApp {
 //            new SessionWindowJoin().doMain();
 //            new SlidingWindowJoin().doMain();
 //            new TumblingWindowJoin().doMain();
+
+            // process 低阶函数
+            new ProcessFunctionKeyedStream().doMain();
+//            new ProcessFunctionBroadcastCo().doMain();
+
+            // Sink 输出到外部系统
+//            new ReadKafkaWriteLocalFile().doMain();
+
+
+
         } catch (Exception e) {
             log.error("流计算程序处理错误!");
             e.printStackTrace();

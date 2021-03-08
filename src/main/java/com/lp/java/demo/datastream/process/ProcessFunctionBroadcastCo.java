@@ -1,11 +1,10 @@
-package com.lp.java.demo.datastream.processfunction;
+package com.lp.java.demo.datastream.process;
 
 import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.FileUtil;
-import com.lp.java.demo.datastream.processfunction.util.PrepareBroadCastData;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -17,24 +16,35 @@ import org.apache.flink.streaming.api.functions.co.CoProcessFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class BroadcastCoProcessFunction extends BaseStreamingEnv<String> implements IBaseRunApp {
+/**
+ * @author li.pan
+ * @version 1.0.0
+ * @title 用于广播的低价函数 BroadcastProcessFunction
+ * @createTime 2021年03月08日 13:36:00
+ * 低价函数: http://www.lllpan.top/article/85
+ */
+public class ProcessFunctionBroadcastCo extends BaseStreamingEnv<String> implements IBaseRunApp {
+
     @Override
     public void doMain() throws Exception {
-        FileUtil.delFile("/Users/meitu/Desktop/1");
+
+        // 注册广播
+        DataStream<Tuple2<String, String>> broadcast =
+                env.fromCollection(getBroadcastData()).broadcast();
+
+
         FlinkKafkaConsumer<String> consumer = getKafkaConsumer(KafkaConfigPo.kvTopic1, new SimpleStringSchema());
 
         KeyedStream<Tuple2<String, Long>, String> keyByStream = env
                 .addSource(consumer)
-                .map(new Split2KV())
+                .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0);
 
-        // 注册广播
-        DataStream<Tuple2<String, String>> broadcast =
-                env.fromCollection(PrepareBroadCastData.getBroadcastData()).broadcast();
 
         SingleOutputStreamOperator<Tuple3<String, String, Long>> res =
                 keyByStream
@@ -43,7 +53,6 @@ public class BroadcastCoProcessFunction extends BaseStreamingEnv<String> impleme
                         .process(new CoProcessFunction<Tuple2<String, Long>, Tuple2<String, String>, Tuple3<String, String, Long>>() {
 
                             private static final long serialVersionUID = 4468906271625927719L;
-
                             private Map<String, String> rule = new HashMap<>();
 
                             @Override
@@ -57,11 +66,27 @@ public class BroadcastCoProcessFunction extends BaseStreamingEnv<String> impleme
                             }
                         });
 
-        res.writeAsText("/Users/meitu/Desktop/1");
+
+        res.print();
 
         // execute the program
-        env.execute("Iterative Pi Example");
+        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionBroadcastCo.class.getName());
 
+    }
+
+
+    public static List<Tuple2<String, String>> getBroadcastData() {
+        List<Tuple2<String, String>> data = new ArrayList<>();
+
+        data.add(new Tuple2<>("apple", "red"));
+        data.add(new Tuple2<>("pear", "white"));
+        data.add(new Tuple2<>("nut", "black"));
+        data.add(new Tuple2<>("grape", "orange"));
+        data.add(new Tuple2<>("banana", "yellow"));
+        data.add(new Tuple2<>("pineapple", "purple"));
+        data.add(new Tuple2<>("pomelo", "blue"));
+        data.add(new Tuple2<>("orange", "ching"));
+        return data;
     }
 
 

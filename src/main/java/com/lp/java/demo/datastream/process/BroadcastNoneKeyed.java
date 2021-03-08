@@ -1,7 +1,5 @@
-package com.lp.java.demo.datastream.processfunction;
+package com.lp.java.demo.datastream.process;
 
-import com.lp.java.demo.datastream.processfunction.util.FileUtil;
-import com.lp.java.demo.datastream.processfunction.util.PrepareBroadCastData;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -14,13 +12,20 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class BroadcastNoneKeyed {
+    private final static Logger log = LoggerFactory.getLogger(BroadcastNoneKeyed.class);
+
     public static void main(String[] args) throws Exception {
-        FileUtil.delFile("/Users/meitu/Desktop/1");
+        delFile("/Users/meitu/Desktop/1");
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -38,7 +43,7 @@ public class BroadcastNoneKeyed {
 
         SingleOutputStreamOperator<Tuple2<String, Long>> noneKeyed = env
                 .addSource(kafkaConsumer010)
-                .map(new Split2KV());
+                .map(new RichMapSplit2KV());
 
         MapStateDescriptor<String, String> ruleStateDescriptor = new MapStateDescriptor<>(
                 "RulesBroadcastState",
@@ -47,7 +52,7 @@ public class BroadcastNoneKeyed {
         );
 
         BroadcastStream<Tuple2<String, String>> broadcast = env
-                .fromCollection(PrepareBroadCastData.getBroadcastData())
+                .fromCollection(getBroadcastData())
                 .broadcast(ruleStateDescriptor);
 
 
@@ -81,4 +86,28 @@ public class BroadcastNoneKeyed {
         // execute the program
         env.execute("Iterative Pi Example");
     }
+
+    public static List<Tuple2<String, String>> getBroadcastData() {
+        List<Tuple2<String, String>> data = new ArrayList<>();
+
+        data.add(new Tuple2<>("apple", "red"));
+        data.add(new Tuple2<>("pear", "white"));
+        data.add(new Tuple2<>("nut", "black"));
+        data.add(new Tuple2<>("grape", "orange"));
+        data.add(new Tuple2<>("banana", "yellow"));
+        data.add(new Tuple2<>("pineapple", "purple"));
+        data.add(new Tuple2<>("pomelo", "blue"));
+        data.add(new Tuple2<>("orange", "ching"));
+        return data;
+    }
+
+
+    public static void delFile(String path) {
+        File file = new File(path);
+        if (file.exists() && file.isFile()) {
+            log.info("删除文件Path: {}", path);
+            file.delete();
+        }
+    }
+
 }

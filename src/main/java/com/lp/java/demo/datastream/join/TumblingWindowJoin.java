@@ -4,7 +4,7 @@ import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
-import com.lp.java.demo.datastream.processfunction.util.Split2KV;
+import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -37,11 +37,11 @@ public class TumblingWindowJoin extends BaseStreamingEnv<String> implements IBas
 
         SingleOutputStreamOperator<Tuple2<String, Long>> operator1 = env
                 .addSource(consumerKv1)
-                .map(new Split2KV());
+                .map(new RichMapSplit2KV());
 
         SingleOutputStreamOperator<Tuple2<String, Long>> operator2 = env
                 .addSource(consumerKv2)
-                .map(new Split2KV());
+                .map(new RichMapSplit2KV());
 
         operator1
                 .join(operator2)
