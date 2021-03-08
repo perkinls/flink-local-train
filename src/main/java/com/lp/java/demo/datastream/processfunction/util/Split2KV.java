@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.processfunction.Util;
+package com.lp.java.demo.datastream.processfunction.util;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;

@@ -17,7 +17,7 @@ import java.sql.PreparedStatement;
  * <li>Version: V1.0</li>
  * <li>Description: Sink写出到Mysql</li>
  */
-public class SinkToMysql extends RichSinkFunction<StudentPo> {
+public class RichSinkToMysql extends RichSinkFunction<StudentPo> {
     Connection connection;
     PreparedStatement ps;
 

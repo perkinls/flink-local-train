@@ -1,6 +1,6 @@
 //package com.lp.scala.demo.datastream.windows
 //
-//import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger
+//import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger
 //import com.lp.scala.demo.utils.ConfigUtils
 //import org.apache.flink.api.common.functions.{AggregateFunction, RichMapFunction}
 //import org.apache.flink.api.common.serialization.SimpleStringSchema

@@ -169,7 +169,7 @@ trigger触发器接口有五个方法允许trigger对不同的事件做出反应
 - onMerge()有状态的触发器相关，并在它们相应的窗口合并时合并两个触发器的状态，例如使用会话窗口。
 - clear()该方法主要是执行窗口的删除操作。
 
-代码案例：[Java](/src/main/java/com/lp/java/demo/datastream/trigger)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/trigger)
+代码案例：[Java](/com/lp/java/demo/datastream/windows/trigger)  [Scala](/src/main/scala/com/lp/scala/demo/datastream/trigger)
 
 ### 侧输出（side output）
 

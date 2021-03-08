@@ -1,6 +1,6 @@
 //package com.lp.java.demo.datastream.sink.redis;
 //
-//import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
+//import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger;
 //import com.lp.scala.demo.utils.ConfigUtils;
 //import org.apache.flink.api.common.functions.RichMapFunction;
 //import org.apache.flink.api.common.restartstrategy.RestartStrategies;

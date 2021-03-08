@@ -37,10 +37,10 @@ public class ToolGeneratorWaterMark extends BaseStreamingEnv<JSONObject> impleme
                 /*
                  * {WatermarkStrategy.forMonotonousTimestamps()} 递增WaterMark,当前时间戳充当WaterMark
                  */
-//                .assignTimestampsAndWatermarks(
-//                        WatermarkStrategy.<JSONObject>forMonotonousTimestamps()
-//                                .withTimestampAssigner((SerializableTimestampAssigner<JSONObject>) (element, recordTimestamp) -> element.getLong("time"))
-//                )
+                //.assignTimestampsAndWatermarks(
+                //        WatermarkStrategy.<JSONObject>forMonotonousTimestamps()
+                //                .withTimestampAssigner((SerializableTimestampAssigner<JSONObject>) (element, recordTimestamp) -> element.getLong("time"))
+                //)
 
                 /*
                  * {WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofSeconds(5))} 允许延迟时间的WaterMark

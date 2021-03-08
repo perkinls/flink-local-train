@@ -1,11 +1,5 @@
 package com.lp.java.demo.datastream;
 
-import com.lp.java.demo.datastream.join.DoubleStreamIntervalJoin;
-import com.lp.java.demo.datastream.join.SessionWindowJoin;
-import com.lp.java.demo.datastream.join.SlidingWindowJoin;
-import com.lp.java.demo.datastream.join.TumblingWindowJoin;
-import com.lp.java.demo.datastream.watermark.CustomGeneratorWaterMark;
-import com.lp.java.demo.datastream.watermark.ToolGeneratorWaterMark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +25,17 @@ public class StreamingRunApp {
 //            new AsyncIoTableJoinMysql().doMain();
 //            new AsyncIoTableJoinRedis().doMain();
 
-            // WaterMark
+            // WaterMark水位线
 //            new CustomGeneratorWaterMark().doMain();
-            new ToolGeneratorWaterMark().doMain();
+//            new ToolGeneratorWaterMark().doMain();
+
+            // Windows窗口聚合函数
+//            new TumblingWindowsReduceFunction().doMain();
+//            new SlidingWindowsReduceFunction().doMain();
+//            new SessionWindowsAggregateFunction().doMain();
+//            new ProcessFunctionTumblingWindows().doMain();
+//            new ProcessFunctionWithReduceFunction().doMain();
+//            new ProcessFunctionWithAggregateFunction().doMain();
 
             // window窗口双流Join
 //            new DoubleStreamIntervalJoin().doMain();

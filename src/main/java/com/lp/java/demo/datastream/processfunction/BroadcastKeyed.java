@@ -1,8 +1,8 @@
 package com.lp.java.demo.datastream.processfunction;
 
-import com.lp.java.demo.datastream.processfunction.Util.FileUtil;
-import com.lp.java.demo.datastream.processfunction.Util.PrepareBroadCastData;
-import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
+import com.lp.java.demo.datastream.processfunction.util.FileUtil;
+import com.lp.java.demo.datastream.processfunction.util.PrepareBroadCastData;
+import com.lp.java.demo.datastream.processfunction.util.Split2KV;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ReadOnlyBroadcastState;

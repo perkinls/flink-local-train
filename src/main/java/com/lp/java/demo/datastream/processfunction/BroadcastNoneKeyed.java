@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.processfunction;
 
-import com.lp.java.demo.datastream.processfunction.Util.FileUtil;
-import com.lp.java.demo.datastream.processfunction.Util.PrepareBroadCastData;
+import com.lp.java.demo.datastream.processfunction.util.FileUtil;
+import com.lp.java.demo.datastream.processfunction.util.PrepareBroadCastData;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -14,7 +14,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
-import com.lp.java.demo.datastream.processfunction.Util.Split2KV;
+import com.lp.java.demo.datastream.processfunction.util.Split2KV;
 
 import java.util.Properties;
 

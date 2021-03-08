@@ -11,7 +11,7 @@
 //import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 //import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 //import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-//import com.lp.java.demo.datastream.trigger.CustomProcessingTimeTrigger;
+//import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger;
 //import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumerBase;
 //
 //import java.util.Properties;

@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.sink.mysql;
 
 import com.lp.java.demo.commons.po.StudentPo;
-import com.lp.java.demo.datastream.richfunction.SinkToMysql;
+import com.lp.java.demo.datastream.richfunction.RichSinkToMysql;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -38,7 +38,7 @@ public class JavaCustomSinkToMysql {
             }
         });
 
-        studentStream.addSink(new SinkToMysql());
+        studentStream.addSink(new RichSinkToMysql());
 
         env.execute("JavaCustomSinkToMySQL");
 

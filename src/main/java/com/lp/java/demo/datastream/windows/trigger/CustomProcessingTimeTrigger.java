@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.trigger;
+package com.lp.java.demo.datastream.windows.trigger;
 
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
@@ -11,6 +11,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
  * <li>Date: 2019/12/29 5:00 下午</li>
  * <li>Version: V1.0</li>
  * <li>Description: 自定义元素个数触发器</li>
+ * {关于触发器描述请参考：http://www.lllpan.top/article/39}
  */
 public class CustomProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
     private static final long serialVersionUID = 1L;
@@ -26,7 +27,7 @@ public class CustomProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
         // CONTINUE是代表不做输出，也即是，此时我们想要实现比如100条输出一次，
         // 而不是窗口结束再输出就可以在这里实现。
         if (flag > 9) {
-            System.out.println("触发计算-> flag: " + flag);
+            System.out.println("触发计算-> flag: " + flag + ",onElement : " + element);
             flag = 0;
             return TriggerResult.FIRE;
         } else {
