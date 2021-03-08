@@ -6,7 +6,6 @@ import com.lp.java.demo.commons.po.SensorPo;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.richfunction.RichMapSplit2Sensor;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
