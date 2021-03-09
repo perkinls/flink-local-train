@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.join;
+package com.lp.java.demo.datastream.process;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
 import com.lp.java.demo.datastream.IBaseRunApp;
@@ -13,23 +13,22 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 /**
  * <p/>
- * <li>title: 双流滑动窗口join</li>
+ * <li>title: 低阶操作,用于join流操作</li>
  * <li>@author: li.pan</li>
  * <li>Date: 2020/1/15 1:08 下午</li>
  * <li>Version: V1.0</li>
- * <li>Description: 滑动窗口join</li>
+ * <li>Description: 滚动窗口join</li>
  */
-public class SlidingWindowJoin extends BaseStreamingEnv<String> implements IBaseRunApp {
+public class ProcessFunctionJoin extends BaseStreamingEnv<String> implements IBaseRunApp {
 
     @Override
     public void doMain() throws Exception {
-
         FlinkKafkaConsumer<String> consumerKv1 =
                 getKafkaConsumer(KafkaConfigPo.kvTopic1, new SimpleStringSchema());
         FlinkKafkaConsumer<String> consumerKv2 =
@@ -44,12 +43,11 @@ public class SlidingWindowJoin extends BaseStreamingEnv<String> implements IBase
                 .addSource(consumerKv2)
                 .map(new RichMapSplit2KV());
 
-
         operator1
                 .join(operator2)
                 .where((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
                 .equalTo((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
-                .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(10))) // (滚动窗口)
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(10))) // 滚动窗口
                 //使用执行的用户函数完成连接操作
                 .apply((JoinFunction<Tuple2<String, Long>, Tuple2<String, Long>, Tuple3<String, Long, Long>>) (first, second) -> {
                     Tuple3<String, Long, Long> tuple3 = new Tuple3<>();
@@ -57,8 +55,7 @@ public class SlidingWindowJoin extends BaseStreamingEnv<String> implements IBase
                     tuple3.setField(first.f1, 1);
                     tuple3.setField(second.f1, 2);
                     return tuple3;
-                })
-                .keyBy((KeySelector<Tuple3<String, Long, Long>, Tuple>) key -> key)
+                }).keyBy((KeySelector<Tuple3<String, Long, Long>, Tuple>) key -> key)
                 .reduce((ReduceFunction<Tuple3<String, Long, Long>>) (v1, v2) -> {
                     Tuple3<String, Long, Long> tuple3 = new Tuple3<>();
                     tuple3.setField(v1.f0, 0);
@@ -67,7 +64,7 @@ public class SlidingWindowJoin extends BaseStreamingEnv<String> implements IBase
                     return tuple3;
                 }).print();
 
-        env.execute(JobConfigPo.jobNamePrefix + SlidingWindowJoin.class.getName());
+        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionJoin.class.getName());
 
     }
 }

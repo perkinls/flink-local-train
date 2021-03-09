@@ -1,4 +1,4 @@
-package com.lp.java.demo.commons;
+package com.lp.java.demo.datastream;
 
 /**
  * @author li.pan

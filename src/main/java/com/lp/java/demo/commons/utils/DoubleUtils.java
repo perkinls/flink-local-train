@@ -34,7 +34,7 @@ public class DoubleUtils {
 
             return Double.valueOf(rateStr.substring(0, num) + "." + afterData.substring(0, 2));
         } else {
-            if (rateStr == "1") {
+            if (rateStr.equals("1")) {
                 return Double.valueOf("100");
             } else {
                 return Double.valueOf(rateStr);

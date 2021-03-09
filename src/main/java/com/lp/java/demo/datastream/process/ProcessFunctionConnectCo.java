@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.process;
 
-import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.BaseStreamingEnv;
+import com.lp.java.demo.datastream.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
@@ -24,11 +24,11 @@ import java.util.Map;
 /**
  * @author li.pan
  * @version 1.0.0
- * @title 用于广播的低价函数 BroadcastProcessFunction
+ * @title 用于connect的低价函数 CoProcessFunction
  * @createTime 2021年03月08日 13:36:00
  * 低价函数: http://www.lllpan.top/article/85
  */
-public class ProcessFunctionBroadcastCo extends BaseStreamingEnv<String> implements IBaseRunApp {
+public class ProcessFunctionConnectCo extends BaseStreamingEnv<String> implements IBaseRunApp {
 
     @Override
     public void doMain() throws Exception {
@@ -70,7 +70,7 @@ public class ProcessFunctionBroadcastCo extends BaseStreamingEnv<String> impleme
         res.print();
 
         // execute the program
-        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionBroadcastCo.class.getName());
+        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionConnectCo.class.getName());
 
     }
 

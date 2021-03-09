@@ -1,6 +1,7 @@
-package com.lp.java.demo.datastream;
+package com.lp.java.demo.run;
 
-import com.lp.java.demo.datastream.process.ProcessFunctionKeyedStream;
+import com.lp.java.demo.datastream.sideoutputs.SplitStreamSideOut;
+import com.lp.java.demo.datastream.sideoutputs.WindowLateDataSideOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public class StreamingRunApp {
 
     public static void main(String[] args) {
         try {
-            // 基础算子使用
+            // 基础算子使用 (包含RichFunction)
 //            new DataStreamWordCountApp().doMain();
 //            new DataStreamTransformApp().doMain();
 //            new DataStreamSourceApp().doMain();
@@ -38,24 +39,31 @@ public class StreamingRunApp {
 //            new ProcessFunctionWithReduceFunction().doMain();
 //            new ProcessFunctionWithAggregateFunction().doMain();
 
+            // process 低阶函数
+//            new ProcessFunctionConnectCo().doMain();
+//            new ProcessFunctionJoin().doMain();
+//            new ProcessFunctionKeyedBroadcast().doMain();
+//            new ProcessFunctionKeyedStream().doMain();
+//            new ProcessFunctionNoKeyedBroadcast().doMain();
+//            new ProcessFunctionWindow().doMain();
+
             // window窗口双流Join
 //            new DoubleStreamIntervalJoin().doMain();
 //            new SessionWindowJoin().doMain();
 //            new SlidingWindowJoin().doMain();
 //            new TumblingWindowJoin().doMain();
 
-            // process 低阶函数
-            new ProcessFunctionKeyedStream().doMain();
-//            new ProcessFunctionBroadcastCo().doMain();
+            // SideOutPut 侧输出(延迟数据处理和分流)
+            new WindowLateDataSideOut().doMain();
+            new SplitStreamSideOut().doMain();
+
 
             // Sink 输出到外部系统
 //            new ReadKafkaWriteLocalFile().doMain();
 
 
-
         } catch (Exception e) {
-            log.error("流计算程序处理错误!");
-            e.printStackTrace();
+            log.error("流计算程序处理错误,{}", e.getMessage());
         }
 
     }

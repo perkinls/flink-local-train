@@ -1,15 +1,11 @@
 package com.lp.java.demo.datastream.transformation;
 
-import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.BaseStreamingEnv;
+import com.lp.java.demo.datastream.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;

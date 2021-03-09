@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.Iterations;
+package com.lp.java.demo.datastream.iterations;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;

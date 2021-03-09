@@ -1,6 +1,5 @@
 package com.lp.java.demo.commons.utils;
 
-import com.lp.java.demo.commons.BaseStreamingEnv;
 import com.lp.java.demo.commons.po.config.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;

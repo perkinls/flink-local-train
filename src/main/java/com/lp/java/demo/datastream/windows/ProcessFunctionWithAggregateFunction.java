@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.windows;
 
-import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.BaseStreamingEnv;
+import com.lp.java.demo.datastream.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
@@ -23,9 +23,6 @@ import org.apache.flink.util.Collector;
  * @version 1.0.0
  * @title 使用AggregateFunction与ProcessWindowFunction增量聚合及获取元数据信息
  * @createTime 2021年03月08日 12:45:00
- * <p>
- *
- * </p>
  */
 public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<String> implements IBaseRunApp {
     @Override
@@ -87,6 +84,8 @@ public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<Strin
     }
 
     private static class MyProcessWindowFunction extends ProcessWindowFunction<Double, Tuple3<Double, Long, Long>, String, TimeWindow> {
+        private static final long serialVersionUID = -6865760977964220845L;
+
         @Override
         public void process(String s, Context context, Iterable<Double> elements, Collector<Tuple3<Double, Long, Long>> out) throws Exception {
 

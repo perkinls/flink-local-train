@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.windows;
+package com.lp.java.demo.datastream.process;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
 import com.lp.java.demo.datastream.IBaseRunApp;
@@ -24,7 +24,7 @@ import org.apache.flink.util.Collector;
  * <li>@author: panli0226@sina.com</li>
  * <li>Date: 2020-01-07 22:35</li>
  */
-public class ProcessFunctionTumblingWindows extends BaseStreamingEnv<String> implements IBaseRunApp {
+public class ProcessFunctionWindow extends BaseStreamingEnv<String> implements IBaseRunApp {
 
     @Override
     public void doMain() throws Exception {
@@ -43,7 +43,7 @@ public class ProcessFunctionTumblingWindows extends BaseStreamingEnv<String> imp
 
 
         process.print();
-        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionTumblingWindows.class.getName());
+        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionWindow.class.getName());
     }
 
 

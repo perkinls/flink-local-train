@@ -1,4 +1,4 @@
-package com.lp.java.demo.commons;
+package com.lp.java.demo.datastream;
 
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;

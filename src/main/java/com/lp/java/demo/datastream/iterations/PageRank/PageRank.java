@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.lp.java.demo.datastream.Iterations.PageRank;
+package com.lp.java.demo.datastream.iterations.PageRank;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;

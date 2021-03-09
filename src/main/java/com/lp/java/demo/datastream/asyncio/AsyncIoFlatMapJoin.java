@@ -2,8 +2,8 @@ package com.lp.java.demo.datastream.asyncio;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.BaseStreamingEnv;
+import com.lp.java.demo.datastream.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.commons.po.config.RedisConfigPo;

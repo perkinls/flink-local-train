@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.source;
 
-import com.lp.java.demo.commons.BaseStreamingEnv;
-import com.lp.java.demo.commons.IBaseRunApp;
+import com.lp.java.demo.datastream.BaseStreamingEnv;
+import com.lp.java.demo.datastream.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.datastream.source.function.CustomNonParallelSourceFunction;
 import com.lp.java.demo.datastream.source.function.CustomParallelSourceFunction;
