@@ -107,7 +107,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Boolean enableCheckpoint() {
+    protected Boolean enableCheckpoint() {
         return JobConfigPo.enableCheckpoint;
     }
 
@@ -116,7 +116,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Long setCheckpointInterval() {
+    protected Long setCheckpointInterval() {
         return JobConfigPo.checkpointInterval;
     }
 
@@ -125,7 +125,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public CheckpointingMode setCheckPointingMode() {
+    protected CheckpointingMode setCheckPointingMode() {
         return CheckpointingMode.EXACTLY_ONCE;
     }
 
@@ -134,7 +134,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Long setCheckpointTimeout() {
+    protected Long setCheckpointTimeout() {
         return JobConfigPo.checkpointTimeOut;
     }
 
@@ -143,7 +143,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Long setMinPauseBetweenCheckpoints() {
+    protected Long setMinPauseBetweenCheckpoints() {
         return JobConfigPo.checkpointMinPauseBetween;
     }
 
@@ -152,7 +152,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Integer setMaxConcurrentCheckpoints() {
+    protected Integer setMaxConcurrentCheckpoints() {
         return JobConfigPo.checkpointCurrentCheckpoints;
     }
 
@@ -161,7 +161,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public String setCheckpointStateType() {
+    protected String setCheckpointStateType() {
         return JobConfigPo.checkpointStateType;
     }
 
@@ -170,7 +170,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public CheckpointConfig.ExternalizedCheckpointCleanup setCheckpointClearStrategy() {
+    protected CheckpointConfig.ExternalizedCheckpointCleanup setCheckpointClearStrategy() {
         return CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION;
     }
 
@@ -179,7 +179,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public RestartStrategies.RestartStrategyConfiguration setRestartStrategy() {
+    protected RestartStrategies.RestartStrategyConfiguration setRestartStrategy() {
         // 固定时间间隔重启
         return RestartStrategies.fixedDelayRestart(setRestartAttempts(), setRestartAttemptsInterval());
     }
@@ -189,7 +189,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Integer setRestartAttempts() {
+    protected Integer setRestartAttempts() {
         return JobConfigPo.checkpointRestartAttempts;
     }
 
@@ -199,7 +199,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Long setRestartAttemptsInterval() {
+    protected Long setRestartAttemptsInterval() {
         return JobConfigPo.checkpointRestartAttemptsInterval;
     }
 
@@ -209,7 +209,7 @@ public class BaseStreamingEnv<T> {
      *
      * @return
      */
-    public Integer setDefaultParallelism() {
+    protected Integer setDefaultParallelism() {
         return JobConfigPo.defaultParallelism;
     }
 
@@ -219,15 +219,26 @@ public class BaseStreamingEnv<T> {
      *
      * @param env
      */
-    public void setEnableWaterMarker(StreamExecutionEnvironment env) {
+    protected void setEnableWaterMarker(StreamExecutionEnvironment env) {
         env.getConfig().setAutoWatermarkInterval(setWaterMarkerInterval());
     }
 
     /**
      * 设置是否开启WaterMaker,0表示禁用,>1启用
      */
-    public long setWaterMarkerInterval() {
+    protected long setWaterMarkerInterval() {
         return 0;
+    }
+
+
+    /**
+     * 设置kafka消费之默认消费起始位置
+     *
+     * @param consumer
+     */
+    protected void setKafkaFromOffsets(FlinkKafkaConsumer<T> consumer) {
+        // 从topic中指定的group上次消费的位置开始消费，必须配置group.id参数
+        consumer.setStartFromGroupOffsets();
     }
 
     /**
@@ -260,9 +271,11 @@ public class BaseStreamingEnv<T> {
                 kafkaConsumer.setCommitOffsetsOnCheckpoints(true);
             }
 
-            // 从topic中指定的group上次消费的位置开始消费，必须配置group.id参数
-            kafkaConsumer.setStartFromGroupOffsets();
+            // 设置kafka消费起始位置
+            setKafkaFromOffsets(kafkaConsumer);
+
 //            kafkaConsumer.assignTimestampsAndWatermarks();
+
 
             log.info("kafka 消费者配置完成 ...");
             return kafkaConsumer;
@@ -270,6 +283,5 @@ public class BaseStreamingEnv<T> {
             throw new RuntimeException("kafka 消费者配置错误！", e);
         }
     }
-
 
 }

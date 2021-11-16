@@ -6,6 +6,7 @@ import com.lp.java.demo.datastream.sink.hbase.ReadKafkaWriteHBase;
 import com.lp.java.demo.datastream.source.DataStreamSourceApp;
 import com.lp.java.demo.datastream.source.KafkaSourceApp;
 import com.lp.java.demo.datastream.watermark.CustomGeneratorWaterMark;
+import com.lp.java.demo.datastream.windows.TumblingWindowsReduceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +29,11 @@ public class StreamingRunApp {
 //            new KafkaSourceApp().doMain();
 
             // WaterMark水位线
-            new CustomGeneratorWaterMark().doMain();
+//            new CustomGeneratorWaterMark().doMain();
 //            new ToolGeneratorWaterMark().doMain();
 
             // Windows窗口聚合函数
-//            new TumblingWindowsReduceFunction().doMain();
+            new TumblingWindowsReduceFunction().doMain();
 //            new SlidingWindowsReduceFunction().doMain();
 //            new SessionWindowsAggregateFunction().doMain();
 //            new ProcessFunctionTumblingWindows().doMain();
