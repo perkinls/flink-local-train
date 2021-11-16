@@ -28,6 +28,8 @@ public class JavaCounterApp {
 
         DataSet<String> info = data.map(new RichMapFunction<String, String>() {
 
+            private static final long serialVersionUID = -229422282309933742L;
+
             LongCounter counter = new LongCounter();
 
             @Override

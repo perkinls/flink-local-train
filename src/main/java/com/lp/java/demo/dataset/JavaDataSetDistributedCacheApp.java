@@ -31,6 +31,7 @@ public class JavaDataSetDistributedCacheApp {
 
         data.map(new RichMapFunction<String, String>() {
 
+            private static final long serialVersionUID = 5427255852560490446L;
             List<String> list = new ArrayList<String>();
             // step2：在open方法中获取到分布式缓存的内容即可
             @Override

@@ -32,7 +32,7 @@ public class JavaDataSetTransformationApp {
 //        distinctFunction(env);
 //        joinFunction(env);
 //        outerJoinFunction(env);
-//        crossFunction(env);
+        crossFunction(env);
     }
 
     /**

@@ -40,7 +40,7 @@ public class JobConfigPo implements Serializable {
     /**
      * checkpoint类型
      */
-    public static String checkpointType;
+    public static String checkpointStateType;
 
     /**
      * checkpoint路径

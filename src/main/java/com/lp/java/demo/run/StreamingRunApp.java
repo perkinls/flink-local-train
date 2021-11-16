@@ -1,7 +1,10 @@
 package com.lp.java.demo.run;
 
-import com.lp.java.demo.datastream.sideoutputs.SplitStreamSideOut;
-import com.lp.java.demo.datastream.sideoutputs.WindowLateDataSideOut;
+import com.lp.java.demo.datastream.sink.es.ReadKafkaWriteElastic;
+import com.lp.java.demo.datastream.sink.file.ReadKafkaWriteLocalFile;
+import com.lp.java.demo.datastream.sink.hbase.ReadKafkaWriteHBase;
+import com.lp.java.demo.datastream.source.DataStreamSourceApp;
+import com.lp.java.demo.datastream.source.KafkaSourceApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +19,14 @@ public class StreamingRunApp {
 
     public static void main(String[] args) {
         try {
-            // 基础算子使用 (包含RichFunction)
 //            new DataStreamWordCountApp().doMain();
+            // 基础算子使用 (包含RichFunction)
 //            new DataStreamTransformApp().doMain();
 //            new DataStreamSourceApp().doMain();
 
+            new KafkaSourceApp().doMain();
+
             // AsyncIo异步IO
-//            new KafkaSourceApp().doMain();
 //            new AsyncIoFlatMapJoin().doMain();
 //            new AsyncIoTableJoinMysql().doMain();
 //            new AsyncIoTableJoinRedis().doMain();
@@ -46,6 +50,7 @@ public class StreamingRunApp {
 //            new ProcessFunctionKeyedStream().doMain();
 //            new ProcessFunctionNoKeyedBroadcast().doMain();
 //            new ProcessFunctionWindow().doMain();
+//            new TimeToLiveApp().doMain();
 
             // window窗口双流Join
 //            new DoubleStreamIntervalJoin().doMain();
@@ -54,16 +59,18 @@ public class StreamingRunApp {
 //            new TumblingWindowJoin().doMain();
 
             // SideOutPut 侧输出(延迟数据处理和分流)
-            new WindowLateDataSideOut().doMain();
-            new SplitStreamSideOut().doMain();
-
+//            new WindowLateDataSideOut().doMain();
+//            new SplitStreamSideOut().doMain();
 
             // Sink 输出到外部系统
-//            new ReadKafkaWriteLocalFile().doMain();
+            new ReadKafkaWriteLocalFile().doMain();
+            new ReadKafkaWriteElastic().doMain();
+            new ReadKafkaWriteHBase().doMain();
 
 
         } catch (Exception e) {
             log.error("流计算程序处理错误,{}", e.getMessage());
+            e.printStackTrace();
         }
 
     }

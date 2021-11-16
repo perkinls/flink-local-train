@@ -17,9 +17,9 @@ public class ConfigUtils {
 
     private final static Logger log = LoggerFactory.getLogger(ConfigUtils.class);
 
-    private static Config rootConfig = ConfigFactory.load("conf/application");
+    private static final Config rootConfig = ConfigFactory.load("conf/env-init");
 
-    private static String configType;
+    private static final String configType;
 
     static {
         configType = rootConfig.getString("init-config-type");
@@ -29,19 +29,21 @@ public class ConfigUtils {
      * load初始化加载加载
      */
     public static void initLoadConfig() {
-        Config eleConfig = rootConfig.getConfig(configType);
+        // 根据环境标识，加载不同环境配置
+        Config eleConfig = ConfigFactory.load("conf/" + configType + "-application");
         loadKafkaConfig(eleConfig);
         loadJobConfig(eleConfig);
         loadMysqlConfig(eleConfig);
         loadRedisConfig(eleConfig);
         loadFileConfig(eleConfig);
+        loadEsConfig(eleConfig);
         log.info("加载配置文件初始化完成 ...");
     }
 
     private static void loadFileConfig(Config pConfig) {
-        Config fileConfig = pConfig.getConfig("file");
-        FileConfigPo.localFile=fileConfig.getString("local-file-dir");
-        FileConfigPo.hdfsFile=fileConfig.getString("hdfs-file");
+        Config fileConfig = pConfig.getConfig("local-file");
+        FileConfigPo.localFile = fileConfig.getString("local-file-dir");
+        FileConfigPo.hdfsFile = fileConfig.getString("hdfs-file");
     }
 
     /**
@@ -83,7 +85,7 @@ public class ConfigUtils {
         Config checkpointConfig = jobConfig.getConfig("checkpoint");
         JobConfigPo.enableCheckpoint = checkpointConfig.getBoolean("enable");
         JobConfigPo.checkpointInterval = checkpointConfig.getLong("interval");
-        JobConfigPo.checkpointType = checkpointConfig.getString("type");
+        JobConfigPo.checkpointStateType = checkpointConfig.getString("type");
         JobConfigPo.checkPointPath = checkpointConfig.getString("path");
         JobConfigPo.checkpointTimeOut = checkpointConfig.getLong("timeout");
         JobConfigPo.checkpointMinPauseBetween = checkpointConfig.getLong("min.pause.between");
@@ -119,4 +121,27 @@ public class ConfigUtils {
         RedisConfigPo.port = redisConfig.getInt("port");
 
     }
+
+    /**
+     * 加载es相关 配置
+     *
+     * @param pConfig es元素节点父节点
+     */
+    private static void loadEsConfig(Config pConfig) {
+        Config esConfig = pConfig.getConfig("elasticsearch");
+        EsConfigPo.clusterName = esConfig.getString("cluster.name");
+        EsConfigPo.clusterServers = esConfig.getString("cluster.servers");
+        // es 用户名密码认证
+        Config authConfig = esConfig.getConfig("auth");
+        EsConfigPo.krbEnabled = authConfig.getBoolean("enabled");
+        EsConfigPo.krbPrincipal = authConfig.getString("username");
+        EsConfigPo.krbPrincipal = authConfig.getString("password");
+        // es kerberos认证相关
+        Config krbConfig = esConfig.getConfig("kerberos");
+        EsConfigPo.krbEnabled = krbConfig.getBoolean("enabled");
+        EsConfigPo.krbPrincipal = krbConfig.getString("principal");
+        EsConfigPo.Krb5File = krbConfig.getString("krb5.file");
+        EsConfigPo.krbKeytabFile = krbConfig.getString("keytab.file");
+    }
+
 }

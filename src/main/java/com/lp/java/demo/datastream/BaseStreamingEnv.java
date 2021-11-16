@@ -5,6 +5,7 @@ import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.commons.utils.ConfigUtils;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
 import org.apache.flink.runtime.state.StateBackend;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.runtime.state.memory.MemoryStateBackend;
@@ -12,9 +13,14 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -27,7 +33,7 @@ public class BaseStreamingEnv<T> {
 
     private final static Logger log = LoggerFactory.getLogger(BaseStreamingEnv.class);
 
-    public StreamExecutionEnvironment env = getStreamEnv();
+    protected StreamExecutionEnvironment env = getStreamEnv();
 
 
     /**
@@ -36,6 +42,7 @@ public class BaseStreamingEnv<T> {
      * @return
      */
     private StreamExecutionEnvironment getStreamEnv() {
+        // 加载配置文件中的配置项
         try {
             ConfigUtils.initLoadConfig();
         } catch (Exception e) {
@@ -45,43 +52,45 @@ public class BaseStreamingEnv<T> {
         try {
             final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+            // 状态关闭部分可参考官网文档:
+            // https://ci.apache.org/projects/flink/flink-docs-release-1.12/zh/ops/state/state_backends.html
+            switch (setCheckpointStateType()) {
+                case "MEMORY_STATE":
+                    MemoryStateBackend memoryStateBackend = new MemoryStateBackend();
+                    env.setStateBackend(memoryStateBackend); //设置checkpoint存储方式和路径目录
+                    break;
+                case "FS_STATE":
+                    StateBackend fsStateBackend = new FsStateBackend(JobConfigPo.checkPointPath, true);
+                    env.setStateBackend(fsStateBackend); //设置checkpoint存储方式和路径目录
+                case "ROCKS_STATE":
+                    RocksDBStateBackend rocksDBStateBackend = new RocksDBStateBackend(JobConfigPo.checkPointPath);
+                    env.setStateBackend(rocksDBStateBackend);
+                default:
+            }
+
             if (enableCheckpoint()) { // 开启checkpoint
 
                 env.enableCheckpointing(setCheckpointInterval(), setCheckPointingMode());// 设置恰一次处理语义和checkpoint基础配置项
                 env.getCheckpointConfig().setCheckpointTimeout(setCheckpointTimeout()); // CheckPoint超时时间
                 env.getCheckpointConfig().setMinPauseBetweenCheckpoints(setMinPauseBetweenCheckpoints()); // 两次CheckPoint中间最小时间间隔
                 env.getCheckpointConfig().setMaxConcurrentCheckpoints(setMaxConcurrentCheckpoints()); // 同时允许多少个Checkpoint在做快照
-
-                switch (setCheckpointType()) {
-                    case "MEMORY_STATE":
-                        MemoryStateBackend memoryStateBackend = new MemoryStateBackend();
-                        env.setStateBackend(memoryStateBackend); //设置checkpoint存储方式和路径目录
-                        break;
-                    case "FS_STATE":
-                        StateBackend fsStateBackend = new FsStateBackend(JobConfigPo.checkPointPath, true);
-                        env.setStateBackend(fsStateBackend); //设置checkpoint存储方式和路径目录
-                        // TODO RocketsDb
-                        // case "ROCKS_STATE":
-                    default:
-                }
-
+                env.getCheckpointConfig().setTolerableCheckpointFailureNumber(3); // 容忍多少次checkpoint失败,认为是Job失败重启应用
 
                 // checkpoint的清除策略
                 env.getCheckpointConfig().enableExternalizedCheckpoints(setCheckpointClearStrategy());
 
-                /*
-                 * RestartStrategy重启策略，在遇到不可预知的问题时。让Job从上一次完整的Checkpoint处恢复状态，保证Job和挂之前的状态保持一致
-                 * FixedDelayRestartStrategy 固定延时重启策略
-                 */
-                env.setRestartStrategy(setRestartStrategy());
-
             }
+
+            /*
+             * RestartStrategy重启策略，在遇到不可预知的问题时。让Job从上一次完整的Checkpoint处恢复状态，保证Job和挂之前的状态保持一致
+             * FixedDelayRestartStrategy 固定延时重启策略
+             */
+            env.setRestartStrategy(setRestartStrategy());
 
             // 选择设置事件事件和处理事件
             // env.setStreamTimeCharacteristic(setTimeCharacter());
             // 在 Flink 1.12 中，默认的时间属性改变成 EventTime 了
             setEnableWaterMarker(env);
-
 
             // 设置程序并行度
             env.setParallelism(setDefaultParallelism());
@@ -148,12 +157,12 @@ public class BaseStreamingEnv<T> {
     }
 
     /**
-     * 设置默认checkpoint类型
+     * 设置默认checkpoint State类型
      *
      * @return
      */
-    public String setCheckpointType() {
-        return JobConfigPo.checkpointType;
+    public String setCheckpointStateType() {
+        return JobConfigPo.checkpointStateType;
     }
 
     /**
@@ -171,6 +180,7 @@ public class BaseStreamingEnv<T> {
      * @return
      */
     public RestartStrategies.RestartStrategyConfiguration setRestartStrategy() {
+        // 固定时间间隔重启
         return RestartStrategies.fixedDelayRestart(setRestartAttempts(), setRestartAttemptsInterval());
     }
 
@@ -223,7 +233,9 @@ public class BaseStreamingEnv<T> {
     /**
      * 获取Kafka消费者
      *
-     * @return kafkaConsumer
+     * @param topic       指定topic
+     * @param serialModel 指定序列化方式
+     * @return FlinkKafkaConsumer对象
      */
     public FlinkKafkaConsumer<T> getKafkaConsumer(String topic, DeserializationSchema<T> serialModel) {
         try {

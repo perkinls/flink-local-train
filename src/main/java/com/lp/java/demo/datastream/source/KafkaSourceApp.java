@@ -27,20 +27,25 @@ public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRun
 
     private final static Logger log = LoggerFactory.getLogger(KafkaSourceApp.class);
 
+    @Override
+    public Integer setDefaultParallelism() {
+        return 4;
+    }
 
     @Override
     public void doMain() throws Exception {
-        FlinkKafkaConsumer<String> kafkaConsumer = getKafkaConsumer(KafkaConfigPo.stringTopic, new SimpleStringSchema());
-
+        FlinkKafkaConsumer<String> kafkaConsumer =
+                getKafkaConsumer(KafkaConfigPo.stringTopic, new SimpleStringSchema());
 
         AllWindowedStream<Integer, TimeWindow> stream =
                 env
                         .addSource(kafkaConsumer)
                         .map(new String2Integer())
                         .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
-                        //.trigger(ProcessingTimeTrigger.create());
+//                        .trigger(ProcessingTimeTrigger.create());
                         // 自定义触发器在满足条件时会出发,窗口结束时也会触发
                         .trigger(CustomProcessingTimeTrigger.create());
+
 
         // 聚合所有窗口
         stream.sum(0).print();
@@ -65,15 +70,6 @@ public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRun
 
             return Integer.valueOf(event);
         }
-
-        @Override
-        public void open(Configuration parameters) throws Exception {
-        }
     }
 
-
-    @Override
-    public Integer setDefaultParallelism() {
-        return 4;
-    }
 }

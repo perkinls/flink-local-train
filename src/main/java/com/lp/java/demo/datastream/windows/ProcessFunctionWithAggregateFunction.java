@@ -25,6 +25,7 @@ import org.apache.flink.util.Collector;
  * @createTime 2021年03月08日 12:45:00
  */
 public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<String> implements IBaseRunApp {
+
     @Override
     public void doMain() throws Exception {
         FlinkKafkaConsumer<String> kafkaConsumer
