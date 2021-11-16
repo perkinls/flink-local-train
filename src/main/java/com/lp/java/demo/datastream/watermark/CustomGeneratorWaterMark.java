@@ -22,10 +22,11 @@ import org.slf4j.LoggerFactory;
  * <li>@author: li.pan</li>
  * <li>Date: 2020/01/07 22:01 下午</li>
  * <li>Version: V1.0</li>
- * <li>Description:
+ * <p>Description:
  * Flink API 是需要设置一个同时包含 TimestampAssigner 和 WatermarkGenerator 的 WatermarkStrategy。
  * WatermarkStrategy 工具类中也提供了许多常用的 watermark 策略，并且用户也可以在某些必要场景下构建自己的 watermark 策略
- * </li>
+ * </p>
+ * WaterMark是一条特殊的数据记录，WaterMark用于触发窗口，窗口中的元素还是根据EventTime分配的。
  */
 public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> implements IBaseRunApp {
 
@@ -82,6 +83,8 @@ public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> imple
     public static class CustomWatermarkStrategy implements WatermarkStrategy<JSONObject> {
 
         private static final long serialVersionUID = -5817759484914451755L;
+
+        //使用watermark延迟可以解决乱序（系统延迟性拉长）
 
 
         /**
