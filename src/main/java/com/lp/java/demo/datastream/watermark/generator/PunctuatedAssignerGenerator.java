@@ -8,7 +8,7 @@ import org.apache.flink.api.common.eventtime.WatermarkOutput;
 /**
  * @author li.pan
  * @version 1.0.0
- * @title 自定义标记 Watermark 生成器
+ * @title 自定义标记 Watermark 生成器(如数据中来一条记录yy,生成一条watermark)
  * @createTime 2021年02月25日 14:02:00
  * <p>
  * 标记watermark生成器观察流事件数据并在获取到带有watermark信息的特殊事件元素时发出watermark。

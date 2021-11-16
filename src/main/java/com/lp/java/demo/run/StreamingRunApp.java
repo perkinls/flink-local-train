@@ -5,6 +5,7 @@ import com.lp.java.demo.datastream.sink.file.ReadKafkaWriteLocalFile;
 import com.lp.java.demo.datastream.sink.hbase.ReadKafkaWriteHBase;
 import com.lp.java.demo.datastream.source.DataStreamSourceApp;
 import com.lp.java.demo.datastream.source.KafkaSourceApp;
+import com.lp.java.demo.datastream.watermark.CustomGeneratorWaterMark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +25,10 @@ public class StreamingRunApp {
 //            new DataStreamTransformApp().doMain();
 //            new DataStreamSourceApp().doMain();
 
-            new KafkaSourceApp().doMain();
-
-            // AsyncIo异步IO
-//            new AsyncIoFlatMapJoin().doMain();
-//            new AsyncIoTableJoinMysql().doMain();
-//            new AsyncIoTableJoinRedis().doMain();
+//            new KafkaSourceApp().doMain();
 
             // WaterMark水位线
-//            new CustomGeneratorWaterMark().doMain();
+            new CustomGeneratorWaterMark().doMain();
 //            new ToolGeneratorWaterMark().doMain();
 
             // Windows窗口聚合函数
@@ -42,6 +38,11 @@ public class StreamingRunApp {
 //            new ProcessFunctionTumblingWindows().doMain();
 //            new ProcessFunctionWithReduceFunction().doMain();
 //            new ProcessFunctionWithAggregateFunction().doMain();
+
+            // AsyncIo异步IO
+//            new AsyncIoFlatMapJoin().doMain();
+//            new AsyncIoTableJoinMysql().doMain();
+//            new AsyncIoTableJoinRedis().doMain();
 
             // process 低阶函数
 //            new ProcessFunctionConnectCo().doMain();

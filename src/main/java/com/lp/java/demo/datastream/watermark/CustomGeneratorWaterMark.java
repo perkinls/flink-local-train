@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * <li>Date: 2020/01/07 22:01 下午</li>
  * <li>Version: V1.0</li>
  * <li>Description:
- * Flink API 时需要设置一个同时包含 TimestampAssigner 和 WatermarkGenerator 的 WatermarkStrategy。
+ * Flink API 是需要设置一个同时包含 TimestampAssigner 和 WatermarkGenerator 的 WatermarkStrategy。
  * WatermarkStrategy 工具类中也提供了许多常用的 watermark 策略，并且用户也可以在某些必要场景下构建自己的 watermark 策略
  * </li>
  */
@@ -39,15 +39,16 @@ public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> imple
         /**
          * 添加数据源/ WaterMark抽取与设置 / 滚动窗口，大小为10s / 处理乱序允许10s延迟 / 终端输出
          */
+        log.info("并行度：{}", env.getParallelism());
         env
                 .addSource(kafkaConsumer)
                 .assignTimestampsAndWatermarks(new CustomWatermarkStrategy())
                 .keyBy((KeySelector<JSONObject, String>) value -> value.getString("fruit"))
-                .window(TumblingEventTimeWindows.of(Time.seconds(30)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(30))) //30s时间的滚动窗口
                 .allowedLateness(Time.seconds(3))
                 .reduce((ReduceFunction<JSONObject>) (v1, v2) -> {
 
-                    // Tips 窗口累加,如果key只有一条记录 原样输出
+                    // Tips 窗口累加,如果key只有一条记录 >>> 原样输出
                     String fruit = v1.getString("fruit");
                     int number1 = v1.getInt("number");
                     int number2 = v2.getInt("number");
@@ -58,7 +59,7 @@ public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> imple
                     return json;
 
                 })
-                .print();
+                .print("result");
 
         env.execute(JobConfigPo.jobNamePrefix + CustomGeneratorWaterMark.class.getName());
     }
@@ -66,7 +67,7 @@ public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> imple
     @Override
     public long setWaterMarkerInterval() {
         // waterMark在父类中默认禁用,重写该方法>0启用
-        return 1000;
+        return 5000;
     }
 
     @Override
@@ -96,7 +97,7 @@ public class CustomGeneratorWaterMark extends BaseStreamingEnv<JSONObject> imple
         }
 
         /**
-         * 根据策略实例化一个 watermark 生成器。
+         * 根据策略实例化一个 WatermarkGenerator 生成器。
          *
          * @param context
          * @return

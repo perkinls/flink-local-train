@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author li.pan
  * @version 1.0.0
- * @title 自定义周期性 Watermark 生成器(事件时间),允许乱序
+ * @title 自定义周期性 Watermark 生成器(event时间),允许乱序
  * @createTime 2021年02月25日 13:53:00
  * <p>
  * 该watermark生成器可以覆盖的场景是：
@@ -47,10 +47,13 @@ public class BoundedOutOfOrderGenerator implements WatermarkGenerator<JSONObject
     @Override
     public void onPeriodicEmit(WatermarkOutput output) {
         // 发出的 watermark = 当前最大时间戳 - 最大乱序时间
-        // log.info("当前 Watermark: {} ", new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1));
+        log.info("当前 Watermark: {} ", new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1));
         output.emitWatermark(
                 new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1)
         );
     }
+
+
+
 
 }

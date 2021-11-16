@@ -12,8 +12,8 @@ public class MockDataRunApp {
 
     public static void main(String[] args) throws InterruptedException {
 
-        KafkaProducerUtils.sendMsgString();
-//        KafkaProducerUtils.sendMsgJson();
+//        KafkaProducerUtils.sendMsgString();
+        KafkaProducerUtils.sendMsgJson();
 //        KafkaProducerUtils.sendMsgKv();
 //        KafkaProducerUtils.sendMsgEvent();
 //        KafkaProducerUtils.sendMsgSensor();

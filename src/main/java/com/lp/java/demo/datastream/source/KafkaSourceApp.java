@@ -8,6 +8,7 @@ import com.lp.java.demo.datastream.windows.trigger.CustomProcessingTimeTrigger;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.runtime.jobgraph.JobVertex;
 import org.apache.flink.streaming.api.datastream.AllWindowedStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -29,11 +30,12 @@ public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRun
 
     @Override
     public Integer setDefaultParallelism() {
-        return 4;
+        return 1;
     }
 
     @Override
     public void doMain() throws Exception {
+        // 指定kafka topic和序列化方式
         FlinkKafkaConsumer<String> kafkaConsumer =
                 getKafkaConsumer(KafkaConfigPo.stringTopic, new SimpleStringSchema());
 
@@ -50,8 +52,9 @@ public class KafkaSourceApp extends BaseStreamingEnv<String> implements IBaseRun
         // 聚合所有窗口
         stream.sum(0).print();
 
+
         // 获取JobGraph 调用 getStreamGraph 会清除 transformations 避免和 execute并行使用
-//        Iterable<JobVertex> vertices = env.getStreamGraph().getJobGraph().getVertices();
+//        Iterable<JobVertex> vertices = stream.getExecutionEnvironment().getStreamGraph().getJobGraph().getVertices();
 //        for (JobVertex vertex : vertices) {
 //            log.info("vertex ====>《Name:》 {} 《Id:》 {}", vertex.getName(), vertex.getID());
 //        }
