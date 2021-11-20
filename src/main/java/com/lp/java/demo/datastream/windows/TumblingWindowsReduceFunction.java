@@ -53,7 +53,7 @@ public class TumblingWindowsReduceFunction extends BaseStreamingEnv<String> impl
                 .trigger(CustomProcessingTimeTrigger.create())
                 .reduce((ReduceFunction<Tuple2<String, Long>>) (v1, v2) -> new Tuple2<>(v1.f0, v1.f1 + v2.f1));
 
-        fold.print("fold result:");
+        fold.print("TumblingWindow fold result:");
 
         env.execute(JobConfigPo.jobNamePrefix + TumblingWindowsReduceFunction.class.getName());
 

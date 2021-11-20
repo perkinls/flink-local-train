@@ -16,7 +16,11 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.table.shaded.org.joda.time.DateTime;
+import org.apache.flink.table.shaded.org.joda.time.DateTimeZone;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author li.pan
@@ -25,13 +29,14 @@ import org.apache.flink.util.Collector;
  * @createTime 2021年03月08日 12:45:00
  */
 public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<String> implements IBaseRunApp {
+    private static final Logger log = LoggerFactory.getLogger(ProcessFunctionWithAggregateFunction.class);
 
     @Override
     public void doMain() throws Exception {
         FlinkKafkaConsumer<String> kafkaConsumer
                 = getKafkaConsumer(KafkaConfigPo.kvTopic1, new SimpleStringSchema());
 
-        SingleOutputStreamOperator<Tuple3<Double, Long, Long>> aggregate = env
+        SingleOutputStreamOperator<Tuple3<Double, String, String>> aggregate = env
                 .addSource(kafkaConsumer)
                 .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
@@ -50,12 +55,14 @@ public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<Strin
         // Tuple2 第一个元素用来累加，第二个用来计数的
         @Override
         public Tuple2<Long, Long> createAccumulator() {
+            log.info("---------------- createAccumulator ----------------");
             return new Tuple2<>(0L, 0L);
         }
 
 
         @Override
         public Tuple2<Long, Long> add(Tuple2<String, Long> value, Tuple2<Long, Long> accumulator) {
+            log.info("---------------- add ----------------ele1: {}, ele2: {}", value, accumulator);
             return new Tuple2<>(accumulator.f0 + value.f1, accumulator.f1 + 1L);
         }
 
@@ -67,7 +74,8 @@ public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<Strin
          */
         @Override
         public Double getResult(Tuple2<Long, Long> accumulator) {
-            System.out.println("触发: getResult 累加计算结果 \t" + accumulator.f0 + "---->" + accumulator.f1);
+            log.info("---------------- getResult: {},{} ----------------", accumulator.f0, accumulator.f1);
+//            System.out.println("触发: getResult 累加计算结果 \t" + accumulator.f0 + "---->" + accumulator.f1);
             return Double.valueOf(accumulator.f0);
         }
 
@@ -80,17 +88,21 @@ public class ProcessFunctionWithAggregateFunction extends BaseStreamingEnv<Strin
          */
         @Override
         public Tuple2<Long, Long> merge(Tuple2<Long, Long> a, Tuple2<Long, Long> b) {
+            log.info("---------------- merge ----------------");
             return new Tuple2<>(a.f0 + b.f0, a.f1 + b.f1);
         }
     }
 
-    private static class MyProcessWindowFunction extends ProcessWindowFunction<Double, Tuple3<Double, Long, Long>, String, TimeWindow> {
+    private static class MyProcessWindowFunction extends ProcessWindowFunction<Double, Tuple3<Double, String, String>, String, TimeWindow> {
         private static final long serialVersionUID = -6865760977964220845L;
 
         @Override
-        public void process(String s, Context context, Iterable<Double> elements, Collector<Tuple3<Double, Long, Long>> out) throws Exception {
+        public void process(String s, Context context, Iterable<Double> elements, Collector<Tuple3<Double, String, String>> out) throws Exception {
 
-            out.collect(new Tuple3<>(elements.iterator().next(), context.window().getStart(), context.window().getEnd()));
+            String windowStart = new DateTime(context.window().getStart(), DateTimeZone.forID("+08:00")).toString("yyyy-MM-dd HH:mm:ss");
+            String windowEnd = new DateTime(context.window().getEnd(), DateTimeZone.forID("+08:00")).toString("yyyy-MM-dd HH:mm:ss");
+
+            out.collect(new Tuple3<>(elements.iterator().next(), windowStart, windowEnd));
         }
     }
 }

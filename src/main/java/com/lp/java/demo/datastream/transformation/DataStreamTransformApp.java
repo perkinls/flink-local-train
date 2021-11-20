@@ -9,6 +9,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.ConnectedStreams;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -32,13 +33,13 @@ public class DataStreamTransformApp extends BaseStreamingEnv<Object> implements 
 
     @Override
     public void doMain() throws Exception {
-        map(env);
-        filterFunction(env);
-        flatMap(env);
-        connectFunction(env);
-        unionFunction(env);
-        splitSelectFunction(env);
-        //reduceFunction(env);
+//        map(env);
+//        filterFunction(env);
+//        flatMap(env);
+//        connectFunction(env);
+//        unionFunction(env);
+//        splitSelectFunction(env);
+        reduceFunction(env);
         env.execute(JobConfigPo.jobNamePrefix + DataStreamTransformApp.class.getName());
 
     }
@@ -54,8 +55,18 @@ public class DataStreamTransformApp extends BaseStreamingEnv<Object> implements 
             for (String word : splits) {
                 out.collect(word);
             }
-        }).map((MapFunction<String, Tuple2<String, Integer>>) value -> Tuple2.of(value, 1)).keyBy(x -> x.f0) // word相同的都会分到一个task中去执行
-                .reduce((ReduceFunction<Tuple2<String, Integer>>) (value1, value2) -> Tuple2.of(value1.f0, value1.f1 + value2.f1))
+        }).returns(Types.STRING)
+                .map((MapFunction<String, Tuple2<String, Integer>>) value -> Tuple2.of(value, 1))
+                .returns(Types.TUPLE(Types.STRING, Types.INT))
+                .keyBy(x -> x.f0) // word相同的都会分到一个task中去执行
+                .reduce((ReduceFunction<Tuple2<String, Integer>>) (value1, value2) -> {
+                            log.info("============== reduce ==============");
+                            return Tuple2.of(value1.f0, value1.f1 + value2.f1);
+                        }
+                )
+                .returns(Types.TUPLE(Types.STRING, Types.INT))
+
+
                 .print();
     }
 

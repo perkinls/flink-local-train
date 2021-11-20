@@ -1,12 +1,8 @@
 package com.lp.java.demo.run;
 
-import com.lp.java.demo.datastream.sink.es.ReadKafkaWriteElastic;
-import com.lp.java.demo.datastream.sink.file.ReadKafkaWriteLocalFile;
-import com.lp.java.demo.datastream.sink.hbase.ReadKafkaWriteHBase;
-import com.lp.java.demo.datastream.source.DataStreamSourceApp;
-import com.lp.java.demo.datastream.source.KafkaSourceApp;
-import com.lp.java.demo.datastream.watermark.CustomGeneratorWaterMark;
-import com.lp.java.demo.datastream.windows.TumblingWindowsReduceFunction;
+import com.lp.java.demo.datastream.transformation.DataStreamTransformApp;
+import com.lp.java.demo.datastream.windows.ProcessFunctionWithAggregateFunction;
+import com.lp.java.demo.datastream.windows.ProcessFunctionWithReduceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +29,12 @@ public class StreamingRunApp {
 //            new ToolGeneratorWaterMark().doMain();
 
             // Windows窗口聚合函数
-            new TumblingWindowsReduceFunction().doMain();
+//            new TumblingWindowsReduceFunction().doMain();
 //            new SlidingWindowsReduceFunction().doMain();
 //            new SessionWindowsAggregateFunction().doMain();
 //            new ProcessFunctionTumblingWindows().doMain();
 //            new ProcessFunctionWithReduceFunction().doMain();
-//            new ProcessFunctionWithAggregateFunction().doMain();
+            new ProcessFunctionWithAggregateFunction().doMain();
 
             // AsyncIo异步IO
 //            new AsyncIoFlatMapJoin().doMain();
@@ -65,9 +61,9 @@ public class StreamingRunApp {
 //            new SplitStreamSideOut().doMain();
 
             // Sink 输出到外部系统
-            new ReadKafkaWriteLocalFile().doMain();
-            new ReadKafkaWriteElastic().doMain();
-            new ReadKafkaWriteHBase().doMain();
+//            new ReadKafkaWriteLocalFile().doMain();
+//            new ReadKafkaWriteElastic().doMain();
+//            new ReadKafkaWriteHBase().doMain();
 
 
         } catch (Exception e) {

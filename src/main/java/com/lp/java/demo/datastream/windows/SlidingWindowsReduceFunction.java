@@ -24,18 +24,24 @@ public class SlidingWindowsReduceFunction extends BaseStreamingEnv<String> imple
     @Override
     public void doMain() throws Exception {
 
+        // 获取kafka消费者（指定topic、序列化方式）
         FlinkKafkaConsumer<String> kafkaConsumer =
                 getKafkaConsumer(KafkaConfigPo.kvTopic1, new SimpleStringSchema());
 
+        /*
+         * 添加数据源/数据转换/keyBy/滚动窗口/触发器/聚合
+         *
+         * tips:一个元素可能分配到两个窗口内
+         */
         SingleOutputStreamOperator<Tuple2<String, Long>> reduce = env
                 .addSource(kafkaConsumer)
                 .map(new RichMapSplit2KV())
                 .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
 //                .windowAll(SlidingEventTimeWindows.of(Time.seconds(10),Time.seconds(10)))
-                .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(10)))
+                .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)))
                 .reduce((ReduceFunction<Tuple2<String, Long>>) (v1, v2) -> new Tuple2<>(v1.f0, v1.f1 + v2.f1));
 
-        reduce.print();
+        reduce.print("SlideWindow reduce result");
 
         env.execute(SlidingWindowsReduceFunction.class.getCanonicalName());
 

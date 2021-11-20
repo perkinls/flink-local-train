@@ -68,6 +68,11 @@ public class CustomProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
         return true;
     }
 
+    /**
+     * session窗口每次会调用
+     * @param window
+     * @param ctx
+     */
     @Override
     public void onMerge(TimeWindow window, OnMergeContext ctx) {
         log.info("==============================Trigger onMerge==============================");
