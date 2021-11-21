@@ -15,6 +15,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.TimeUnit;
@@ -26,9 +28,18 @@ import java.util.concurrent.TimeUnit;
  * <li>Date: 2019-06-14 22:22</li>
  * Caffeine可参考 https://www.cnblogs.com/liujinhua306/p/9808500.html
  * <p>
- * 异步访问外部存储，未传递给下游算子。会被足赛
+ * 异步访问外部存储，未传递给下游算子。会被阻塞
  */
-public class AsyncIoFlatMapJoin extends BaseStreamingEnv<JSONObject> implements IBaseRunApp {
+public class NoAsyncIoFlatMapJoin extends BaseStreamingEnv<JSONObject> implements IBaseRunApp {
+
+    private static final Logger log = LoggerFactory.getLogger(NoAsyncIoFlatMapJoin.class);
+
+
+    @Override
+    public Integer setDefaultParallelism() {
+        return 1;
+    }
+
 
     @Override
     public void doMain() throws Exception {
@@ -47,14 +58,10 @@ public class AsyncIoFlatMapJoin extends BaseStreamingEnv<JSONObject> implements 
                         .flatMap(new JoinWithRedis());
 
         flatMap.print();
-        env.execute(JobConfigPo.jobNamePrefix+AsyncIoFlatMapJoin.class.getName());
+        env.execute(JobConfigPo.jobNamePrefix + NoAsyncIoFlatMapJoin.class.getName());
 
     }
 
-    @Override
-    public Integer setDefaultParallelism() {
-        return 1;
-    }
 
     public static class JoinWithRedis extends RichFlatMapFunction<JSONObject, JSONObject> {
         private static final long serialVersionUID = -5509536907313253423L;

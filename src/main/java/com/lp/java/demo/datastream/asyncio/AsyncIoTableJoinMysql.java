@@ -56,6 +56,7 @@ public class AsyncIoTableJoinMysql extends BaseStreamingEnv<JSONObject> implemen
 
         DataStreamSource<JSONObject> source = env.addSource(kafkaConsumer);
 
+        // AsyncFunction 不是以多线程方式调用的。 只有一个 AsyncFunction 实例
         SampleAsyncFunction asyncFunction = new SampleAsyncFunction();
 
         // DataStream 中增加异步操作
