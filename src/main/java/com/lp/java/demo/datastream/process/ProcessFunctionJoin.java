@@ -43,19 +43,21 @@ public class ProcessFunctionJoin extends BaseStreamingEnv<String> implements IBa
                 .addSource(consumerKv2)
                 .map(new RichMapSplit2KV());
 
+        // 利用Join连接双流,再keyBy聚合计算
         operator1
                 .join(operator2)
                 .where((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
                 .equalTo((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(10))) // 滚动窗口
-                //使用执行的用户函数完成连接操作
+                //apply方法 与对窗口中具有相同键的每个元素组合执行的用户函数完成连接操作。
                 .apply((JoinFunction<Tuple2<String, Long>, Tuple2<String, Long>, Tuple3<String, Long, Long>>) (first, second) -> {
                     Tuple3<String, Long, Long> tuple3 = new Tuple3<>();
                     tuple3.setField(first.f0, 0);
                     tuple3.setField(first.f1, 1);
                     tuple3.setField(second.f1, 2);
                     return tuple3;
-                }).keyBy((KeySelector<Tuple3<String, Long, Long>, Tuple>) key -> key)
+                })
+                .keyBy((KeySelector<Tuple3<String, Long, Long>, String>) key -> key.f0)
                 .reduce((ReduceFunction<Tuple3<String, Long, Long>>) (v1, v2) -> {
                     Tuple3<String, Long, Long> tuple3 = new Tuple3<>();
                     tuple3.setField(v1.f0, 0);

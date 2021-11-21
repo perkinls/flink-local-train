@@ -29,6 +29,9 @@ import java.util.Map;
  * @title 用于connect的低价函数 CoProcessFunction
  * @createTime 2021年03月08日 13:36:00
  * 低价函数: { http://www.lllpan.top/article/85 }
+ *
+ * DataStream,DataStream → ConnectedStreams:连接两个保持他们类型的数据流，
+ * 两个数据流被 Connect 之后，只是被放在了一个同一个流中，内部依然保持 各自的数据和形式不发生任何变化，两个流相互独立。
  */
 public class ProcessFunctionConnectCo extends BaseStreamingEnv<String> implements IBaseRunApp {
     private static final Logger log = LoggerFactory.getLogger(ProcessFunctionConnectCo.class);

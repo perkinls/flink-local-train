@@ -1,6 +1,6 @@
 package com.lp.java.demo.run;
 
-import com.lp.java.demo.datastream.process.ProcessFunctionConnectCo;
+import com.lp.java.demo.datastream.process.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +40,12 @@ public class StreamingRunApp {
 //            new AsyncIoTableJoinRedis().doMain();
 
             // process 低阶函数
-            new ProcessFunctionConnectCo().doMain();
+//            new ProcessFunctionExample().doMain();
+//            new ProcessFunctionConnectCo().doMain();
 //            new ProcessFunctionJoin().doMain();
 //            new ProcessFunctionKeyedBroadcast().doMain();
 //            new ProcessFunctionKeyedStream().doMain();
-//            new ProcessFunctionNoKeyedBroadcast().doMain();
+            new ProcessFunctionNoKeyedBroadcast().doMain();
 //            new ProcessFunctionWindow().doMain();
 //            new TimeToLiveApp().doMain();
 

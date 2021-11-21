@@ -15,6 +15,8 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.table.shaded.org.joda.time.DateTime;
+import org.apache.flink.table.shaded.org.joda.time.DateTimeZone;
 import org.apache.flink.util.Collector;
 
 /**
@@ -37,12 +39,12 @@ public class ProcessFunctionWindow extends BaseStreamingEnv<String> implements I
                         .addSource(kafkaConsumer)
                         .map(new RichMapSplit2KV())
                         .keyBy((KeySelector<Tuple2<String, Long>, String>) value -> value.f0)
-                        .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
+                        .window(TumblingProcessingTimeWindows.of(Time.seconds(30)))
                         .trigger(CustomProcessingTimeTrigger.create())
                         .process(new MyProcessWindowFunction());
 
 
-        process.print();
+        process.print("ProcessFunctionWindow result:");
         env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionWindow.class.getName());
     }
 
@@ -54,7 +56,6 @@ public class ProcessFunctionWindow extends BaseStreamingEnv<String> implements I
      * 该算子会浪费很多性能吧，主要原因是不是增量计算，要缓存整个窗口然后再去处理，所以要设计好内存占比。
      * 当然了processWindowFunction可以结合 ReduceFunction, an AggregateFunction, or a FoldFunction来做增量计算。
      * </p>
-     * 注意key类型 Tuple1
      */
     private static class MyProcessWindowFunction extends ProcessWindowFunction<Tuple2<String, Long>, String, String, TimeWindow> {
 
@@ -67,8 +68,10 @@ public class ProcessFunctionWindow extends BaseStreamingEnv<String> implements I
             for (Tuple2<String, Long> in : elements) {
                 count++;
             }
-            System.out.println("--------" + count);
-            out.collect("Window: " + context.window() + "count: " + count);
+            String windowStart = new DateTime(context.window().getStart(), DateTimeZone.forID("+08:00")).toString("yyyy-MM-dd HH:mm:ss");
+            String windowEnd = new DateTime(context.window().getEnd(), DateTimeZone.forID("+08:00")).toString("yyyy-MM-dd HH:mm:ss");
+
+            out.collect("Window: [" + windowStart+", "+windowEnd + "]: count: " + count);
 
         }
     }
