@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.statettl;
+package com.lp.java.demo.datastream.state;
 
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.BaseStreamingEnv;
@@ -24,11 +24,11 @@ import org.apache.flink.util.Collector;
  * @title Flink状态有效行和清理
  * @createTime 2021年03月29日 12:36:00
  * <p>
- * 案例代码主要掩饰State清理配置,具体配置可以参照官网更为详细。(processing time 的 TTL)
+ * 案例代码主要演示State清理配置,具体配置可以参照官网更为详细。(processing time 的 TTL)
  * 官网参考地址: https://ci.apache.org/projects/flink/flink-docs-release-1.12/zh/dev/stream/state/state.html
  * </p>
  */
-public class TimeToLiveApp extends BaseStreamingEnv<JSONObject> implements IBaseRunApp {
+public class StateTimeToLive extends BaseStreamingEnv<JSONObject> implements IBaseRunApp {
     @Override
     public void doMain() throws Exception {
 

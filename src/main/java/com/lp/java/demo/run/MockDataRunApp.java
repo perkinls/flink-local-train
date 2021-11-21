@@ -14,8 +14,8 @@ public class MockDataRunApp {
 
 //        KafkaProducerUtils.sendMsgString();
 //        KafkaProducerUtils.sendMsgJson();
-        KafkaProducerUtils.sendMsgKv();
+//        KafkaProducerUtils.sendMsgKv();
 //        KafkaProducerUtils.sendMsgEvent();
-//        KafkaProducerUtils.sendMsgSensor();
+        KafkaProducerUtils.sendMsgSensor();
     }
 }

@@ -1,4 +1,4 @@
-package com.lp.java.demo.datastream.process;
+package com.lp.java.demo.datastream.state;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
 import com.lp.java.demo.datastream.IBaseRunApp;
@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
  * 需求:
  * 同一传感器两次温度相差10度触发报警
  */
-public class ProcessFunctionKeyedStream extends BaseStreamingEnv<String> implements IBaseRunApp {
+public class StateKeyedStreamWarn extends BaseStreamingEnv<String> implements IBaseRunApp {
 
-    private final static Logger log = LoggerFactory.getLogger(ProcessFunctionKeyedStream.class);
+    private final static Logger log = LoggerFactory.getLogger(StateKeyedStreamWarn.class);
 
     @Override
     public void doMain() throws Exception {
@@ -44,7 +44,7 @@ public class ProcessFunctionKeyedStream extends BaseStreamingEnv<String> impleme
                 .process(new sensor10sTempContinueRise(5))
                 .print();
 
-        env.execute(JobConfigPo.jobNamePrefix + ProcessFunctionKeyedStream.class.getName());
+        env.execute(JobConfigPo.jobNamePrefix + StateKeyedStreamWarn.class.getName());
 
     }
 
@@ -66,7 +66,7 @@ public class ProcessFunctionKeyedStream extends BaseStreamingEnv<String> impleme
 
         @Override
         public void processElement(SensorPo value, Context ctx, Collector<Object> out) throws Exception {
-            if (lastTemp.value() == null) { // 状态为空 未给定 默认值 的情况下
+            if (lastTemp.value() == null) { // 状态为空,未给定 默认值 的情况下
                 lastTemp.update(0.0);
             }
             Double prevTemp = lastTemp.value();

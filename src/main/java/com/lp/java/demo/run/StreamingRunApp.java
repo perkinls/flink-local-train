@@ -1,8 +1,6 @@
 package com.lp.java.demo.run;
 
-import com.lp.java.demo.datastream.transformation.DataStreamTransformApp;
-import com.lp.java.demo.datastream.windows.ProcessFunctionWithAggregateFunction;
-import com.lp.java.demo.datastream.windows.ProcessFunctionWithReduceFunction;
+import com.lp.java.demo.datastream.process.ProcessFunctionConnectCo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +32,15 @@ public class StreamingRunApp {
 //            new SessionWindowsAggregateFunction().doMain();
 //            new ProcessFunctionTumblingWindows().doMain();
 //            new ProcessFunctionWithReduceFunction().doMain();
-            new ProcessFunctionWithAggregateFunction().doMain();
+//            new ProcessFunctionWithAggregateFunction().doMain();
 
             // AsyncIo异步IO
-//            new AsyncIoFlatMapJoin().doMain();
+//            new NoAsyncIoFlatMapJoin().doMain();
 //            new AsyncIoTableJoinMysql().doMain();
 //            new AsyncIoTableJoinRedis().doMain();
 
             // process 低阶函数
-//            new ProcessFunctionConnectCo().doMain();
+            new ProcessFunctionConnectCo().doMain();
 //            new ProcessFunctionJoin().doMain();
 //            new ProcessFunctionKeyedBroadcast().doMain();
 //            new ProcessFunctionKeyedStream().doMain();
