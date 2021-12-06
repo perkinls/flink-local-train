@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.process;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
@@ -9,7 +9,6 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;

@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.windows;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.richfunction.RichMapSplit2KV;
 import org.apache.flink.api.common.functions.ReduceFunction;

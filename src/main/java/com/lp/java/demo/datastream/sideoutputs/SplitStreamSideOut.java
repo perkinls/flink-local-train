@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.sideoutputs;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -24,6 +24,7 @@ import org.apache.flink.util.OutputTag;
  */
 public class SplitStreamSideOut extends BaseStreamingEnv<String> implements IBaseRunApp {
 
+    // 定义侧输出的tag
     final static OutputTag<String> outputTag = new OutputTag<String>("side-output>5") {
         private static final long serialVersionUID = -5205379002618624641L;
     };
@@ -58,8 +59,8 @@ public class SplitStreamSideOut extends BaseStreamingEnv<String> implements IBas
                     }
                 });
 
-        mainStream.print();
-        mainStream.getSideOutput(outputTag).print();
+        mainStream.print("Main Stream");
+        mainStream.getSideOutput(outputTag).print("SideOutPut Stream");
 
         env.execute(JobConfigPo.jobNamePrefix + SplitStreamSideOut.class.getName());
 

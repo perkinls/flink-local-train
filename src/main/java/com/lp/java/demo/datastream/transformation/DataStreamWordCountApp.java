@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.transformation;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;

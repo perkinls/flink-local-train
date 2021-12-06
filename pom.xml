@@ -49,18 +49,6 @@
             <version>${flink.version}</version>
         </dependency>
 
-        <!--flink scala相关依赖-->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-scala_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-
         <!--flink Java相关依赖-->
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -86,13 +74,43 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-hive_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Hive Dependency -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>1.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--flink连接相关依赖-->
@@ -101,11 +119,11 @@
             <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.bahir</groupId>-->
-<!--            <artifactId>flink-connector-redis_2.11</artifactId>-->
-<!--            <version>1.0</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.bahir</groupId>-->
+        <!--            <artifactId>flink-connector-redis_2.11</artifactId>-->
+        <!--            <version>1.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch6_${scala.binary.version}</artifactId>
@@ -148,15 +166,15 @@
             <artifactId>vertx-redis-client</artifactId>
             <version>3.5.2.CR3</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.vertx</groupId>-->
-<!--            <artifactId>lang-scala_2.12</artifactId>-->
-<!--            <version>1.0.1-RC1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.vertx</groupId>-->
+        <!--            <artifactId>lang-scala_2.12</artifactId>-->
+        <!--            <version>1.0.1-RC1</version>-->
+        <!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/io.vertx/vertx-lang-scala -->
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-lang-scala_2.12</artifactId>
+            <artifactId>vertx-lang-scala_${scala.binary.version}</artifactId>
             <version>3.9.1</version>
         </dependency>
 
@@ -207,6 +225,11 @@
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
             <classifier>jdk15</classifier>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
         </dependency>
     </dependencies>
 

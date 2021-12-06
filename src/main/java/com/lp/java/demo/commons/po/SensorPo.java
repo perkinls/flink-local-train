@@ -24,6 +24,10 @@ public class SensorPo implements Serializable {
      */
     private Double temperature;
 
+    // 针对于pojo类型DataStream转Table字段映射需要添加无参构造函数
+    public SensorPo() {
+    }
+
     public SensorPo(String id, Long timestamp, Double temperature) {
         this.id = id;
         this.timestamp = timestamp;

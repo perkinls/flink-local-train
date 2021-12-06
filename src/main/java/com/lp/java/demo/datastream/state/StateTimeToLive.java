@@ -2,7 +2,7 @@ package com.lp.java.demo.datastream.state;
 
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.datastream.source.serialization.JsonDeserializationSchema;
 import net.sf.json.JSONObject;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;

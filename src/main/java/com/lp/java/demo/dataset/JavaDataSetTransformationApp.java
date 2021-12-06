@@ -1,6 +1,6 @@
 package com.lp.java.demo.dataset;
 
-import com.lp.scala.demo.utils.DBUtils;
+import com.lp.java.demo.commons.utils.MySQLUtils;
 import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -9,6 +9,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,9 +253,8 @@ public class JavaDataSetTransformationApp {
         data.mapPartition(new MapPartitionFunction<String, String>() {
             @Override
             public void mapPartition(Iterable<String> inputs, Collector<String> collector) throws Exception {
-                String connection = DBUtils.getConection();
+                Connection connection = MySQLUtils.getConnInstance();
                 System.out.println("connection = [" + connection + "]");
-                DBUtils.returnConnection(connection);
             }
         }).print();
 

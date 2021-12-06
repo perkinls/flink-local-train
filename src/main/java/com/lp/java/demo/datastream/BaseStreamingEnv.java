@@ -53,8 +53,10 @@ public class BaseStreamingEnv<T> {
         try {
             final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-            // 状态关闭部分可参考官网文档:
-            // https://ci.apache.org/projects/flink/flink-docs-release-1.12/zh/ops/state/state_backends.html
+            /*
+             * 设置状态（state）相关
+             * https://ci.apache.org/projects/flink/flink-docs-release-1.12/zh/ops/state/state_backends.html
+             */
             switch (setCheckpointStateType()) {
                 case "MEMORY_STATE":
                     MemoryStateBackend memoryStateBackend = new MemoryStateBackend();
@@ -63,23 +65,23 @@ public class BaseStreamingEnv<T> {
                 case "FS_STATE":
                     StateBackend fsStateBackend = new FsStateBackend(JobConfigPo.checkPointPath, true);
                     env.setStateBackend(fsStateBackend); //设置checkpoint存储方式和路径目录
-                case "ROCKS_STATE":
+                case "ROCKS_STATE": // 支持增量
                     RocksDBStateBackend rocksDBStateBackend = new RocksDBStateBackend(JobConfigPo.checkPointPath);
                     env.setStateBackend(rocksDBStateBackend);
                 default:
             }
 
-            if (enableCheckpoint()) { // 开启checkpoint
 
+            /*
+             * 设置checkpoint相关
+             */
+            if (enableCheckpoint()) { // 开启checkpoint
                 env.enableCheckpointing(setCheckpointInterval(), setCheckPointingMode());// 设置恰一次处理语义和checkpoint基础配置项
                 env.getCheckpointConfig().setCheckpointTimeout(setCheckpointTimeout()); // CheckPoint超时时间
-                env.getCheckpointConfig().setMinPauseBetweenCheckpoints(setMinPauseBetweenCheckpoints()); // 两次CheckPoint中间最小时间间隔
-                env.getCheckpointConfig().setMaxConcurrentCheckpoints(setMaxConcurrentCheckpoints()); // 同时允许多少个Checkpoint在做快照
+                env.getCheckpointConfig().setMinPauseBetweenCheckpoints(setMinPauseBetweenCheckpoints()); // 两次CheckPoint中间最小时间间隔 （是指整个任务的全部checkpoint完成）
+                env.getCheckpointConfig().setMaxConcurrentCheckpoints(setMaxConcurrentCheckpoints()); // 同时允许多少个Checkpoint在做快照（是指整个任务的全部checkpoint完成）
                 env.getCheckpointConfig().setTolerableCheckpointFailureNumber(3); // 容忍多少次checkpoint失败,认为是Job失败重启应用
-
-                // checkpoint的清除策略
-                env.getCheckpointConfig().enableExternalizedCheckpoints(setCheckpointClearStrategy());
-
+                env.getCheckpointConfig().enableExternalizedCheckpoints(setCheckpointClearStrategy());  // checkpoint的清除策略
             }
 
             /*
@@ -277,7 +279,6 @@ public class BaseStreamingEnv<T> {
             setKafkaFromOffsets(kafkaConsumer);
 
 //            kafkaConsumer.assignTimestampsAndWatermarks();
-
 
             log.info("kafka 消费者配置完成 ...");
             return kafkaConsumer;

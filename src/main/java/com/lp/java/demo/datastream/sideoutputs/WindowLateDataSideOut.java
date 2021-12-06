@@ -1,7 +1,7 @@
 package com.lp.java.demo.datastream.sideoutputs;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.datastream.IBaseRunApp;
+import com.lp.java.demo.base.IBaseRunApp;
 import com.lp.java.demo.commons.po.config.JobConfigPo;
 import com.lp.java.demo.commons.po.config.KafkaConfigPo;
 import com.lp.java.demo.datastream.source.serialization.JsonDeserializationSchema;
@@ -30,6 +30,7 @@ public class WindowLateDataSideOut extends BaseStreamingEnv<JSONObject> implemen
     public void doMain() throws Exception {
         // 定义OutputTag
         final OutputTag<JSONObject> lateOutputTag = new OutputTag<JSONObject>("late-data") {
+            private static final long serialVersionUID = 1953448274855055226L;
         };
 
         FlinkKafkaConsumer<JSONObject> consumer =
