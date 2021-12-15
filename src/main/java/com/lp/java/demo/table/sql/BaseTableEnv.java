@@ -1,10 +1,9 @@
 package com.lp.java.demo.table.sql;
 
 import com.lp.java.demo.datastream.BaseStreamingEnv;
-import com.lp.java.demo.table.sql.wordcount.WordCountTable;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.bridge.java.BatchTableEnvironment;
@@ -116,6 +115,15 @@ public abstract class BaseTableEnv<T> extends BaseStreamingEnv<T> {
      *
      */
     protected DataSet<T> mockDataSetData() {
+        return null;
+    }
+
+    /**
+     * 批处理默认加载的数据集
+     * tips: 子类复写该方法,重新模拟批处理环境数据集
+     *
+     */
+    protected DataStream<T> mockDataStreamData() {
         return null;
     }
 

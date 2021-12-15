@@ -40,6 +40,8 @@ public class CreateTable extends BaseTableEnv<WcPo> implements IBaseRunApp {
         //        .option(DataGenOptions.ROWS_PER_SECOND, 100)
         //        .build();
 
+
+
         // No3.Using SQL DDL
         TableResult tableResult = tableOldBatchEnv.executeSql("CREATE [TEMPORARY] TABLE MyTable (...) WITH (...)");
 
